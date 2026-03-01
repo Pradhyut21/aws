@@ -152,18 +152,34 @@ Format:
 
         const spellings: Record<string, string> = { 'bulding': 'building', 'matirals': 'materials', 'dheli': 'Delhi', 'bussiness': 'business', 'mambai': 'Mumbai' };
         const cleanWordsMapped = cleanWords.map(w => spellings[w.toLowerCase()] || w);
-        const cleanString = cleanWordsMapped.join(' ');
+        // Use the exact business they described, or fallback
+        const bizCategory = biz;
+        const bizSlug = bizCategory.replace(/\s+/g, '');
 
-        const synthesizedPhrase = cleanWordsMapped.length > 0
-            ? `Discover premium ${cleanString} tailored just for you!`
-            : `Experience the best of our services today!`;
+        const extractedBizName = cleanWordsMapped.length > 0 ? cleanWordsMapped.join(' ') : (bizCategory.charAt(0).toUpperCase() + bizCategory.slice(1));
 
-        const igCaption = `✨ ${biz} — ${region0} 🎁\n${promo}\n🌟 ${synthesizedPhrase}\n\n#${bizSlug} #VocalForLocal #${region0.replace(/\s+/g, '')}`;
-        const fbCaption = `${greet}\n\n${promo}\n🌟 ${synthesizedPhrase}\n\n${feats.join('\n')}\n📍 ${region0}`;
+        const AI_HOOKS = [
+            `Elevate your experience with the finest ${extractedBizName} services in ${region0}.`,
+            `Your search for premium ${extractedBizName} ends here. Discover unparalleled quality!`,
+            `Transforming the ${bizCategory} landscape in ${region0} with innovation and excellence.`,
+            `Experience the gold standard of ${extractedBizName}. Tailored exclusively for you.`,
+            `Unlocking new possibilities in ${extractedBizName} for the people of ${region0}.`
+        ];
+        const synthesizedPhrase = AI_HOOKS[inputStr.length % AI_HOOKS.length];
+
+        const AI_FACTS = [
+            `💡 Importance of ${extractedBizName}: High-quality ${extractedBizName} significantly boosts the local economy and elevates community standards.`,
+            `💡 Why it matters: ${extractedBizName} plays a crucial role in modern lifestyle improvements and essential daily operations.`,
+            `💡 The Value of ${extractedBizName}: Investing in premier ${extractedBizName} ensures long-term sustained value and outstanding market reliability.`
+        ];
+        const aiFact = AI_FACTS[inputStr.length % AI_FACTS.length];
+
+        const igCaption = `✨ ${extractedBizName} — ${region0} 🎁\n${promo}\n🌟 ${synthesizedPhrase}\n\n${aiFact}\n\n#${bizSlug} #VocalForLocal #${region0.replace(/\s+/g, '')}`;
+        const fbCaption = `${greet}\n\n${promo}\n🌟 ${synthesizedPhrase}\n\n${feats.join('\n')}\n📍 ${region0}\n\n${aiFact}`;
         const twCaption = `🚨 ${promo.slice(0, 80)}... 🌟 ${synthesizedPhrase.slice(0, 50)} #${bizSlug} #${region0.replace(/\s+/g, '')}`;
-        const ytCaption = `🎬 ${biz} — ${region0}\n\n${promo}\n🌟 ${synthesizedPhrase}\n\n${feats.join(' | ')}`;
-        const liCaption = `${greet} Proud to represent ${biz} from ${region0}. ${promo}\n🌟 ${synthesizedPhrase}\n\n#Business #${region0.replace(/\s+/g, '')}`;
-        const waMessage = `${greet}\n\n*${biz}* — ${region0}\n\n${promo}\n✨ ${synthesizedPhrase}\n\n${feats.join('\n')}`;
+        const ytCaption = `🎬 ${extractedBizName} — ${region0}\n\n${promo}\n🌟 ${synthesizedPhrase}\n\n${aiFact}\n\n${feats.join(' | ')}`;
+        const liCaption = `${greet} Proud to represent ${extractedBizName} from ${region0}. ${promo}\n🌟 ${synthesizedPhrase}\n\n${aiFact}\n\n#Business #${region0.replace(/\s+/g, '')}`;
+        const waMessage = `${greet}\n\n*${extractedBizName}* — ${region0}\n\n${promo}\n✨ ${synthesizedPhrase}\n\n${aiFact}\n\n${feats.join('\n')}`;
 
         const igUrl = `https://picsum.photos/seed/${bizSlug}-ig/800/600`;
         const fbUrl = `https://picsum.photos/seed/${bizSlug}-fb/800/600`;
@@ -187,11 +203,10 @@ Format:
                 linkedin: liCaption,
             },
             seo: {
-                title: cleanString ? `${cleanString.slice(0, 30)} | Best ${biz} in ${region0}` : `Best ${biz} in ${region0} — Special Offer 2026`,
-                metaDescription: cleanString ? `Find the best ${biz} deals online. We offer premium ${cleanString.slice(0, 50)}. Guaranteed quality from ${region0}.` : `Authentic ${biz} from ${campaign.region.join(', ')}. Quality guaranteed, fast delivery.`,
+                title: `Top Rated ${extractedBizName} in ${region0} | Guaranteed Quality`,
+                metaDescription: `Looking for the best ${extractedBizName} in ${region0}? We provide elite services and products designed for your needs. Contact us today!`,
                 keywords: [
-                    ...(cleanWordsMapped.slice(0, 4)),
-                    `${biz} ${region0}`, `best ${biz} online`, `local ${biz} ${region0}`, `buy ${biz} ${region0}`
+                    `${extractedBizName}`, `${region0}`, `premium ${extractedBizName}`, `best ${extractedBizName} online`, `local ${bizCategory} shop`
                 ],
             },
             hashtags: [`#${bizSlug}`, '#VocalForLocal', '#MadeInIndia', `#${region0.replace(/\s+/g, '')}Business`, '#IndianSMB'],
