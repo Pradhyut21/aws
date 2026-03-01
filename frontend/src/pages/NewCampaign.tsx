@@ -162,7 +162,8 @@ export default function NewCampaign() {
             for (let i = 0; i < 15; i++) {
                 await new Promise(r => setTimeout(r, 2000));
                 try {
-                    const res = await fetch(`http://localhost:4000/api/campaign/${campaignId}`);
+                    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+                    const res = await fetch(`${apiUrl}/campaign/${campaignId}`);
                     if (res.ok) {
                         const data = await res.json();
                         if (data.status === 'done' && data.content) {
