@@ -59,6 +59,9 @@ export interface GeneratedContent {
     whatsapp: WhatsAppContent;
     hashtags: string[];
     publishTimes: Record<string, string>;
+    distribution?: {
+        bestTime?: string;
+    };
 }
 
 export interface ContentItem {
