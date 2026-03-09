@@ -154,7 +154,7 @@ Format:
         const cleanWordsMapped = cleanWords.map(w => spellings[w.toLowerCase()] || w);
         // Use the exact business they described, or fallback
         const bizCategory = biz;
-        const bizSlug = bizCategory.replace(/\s+/g, '');
+        // bizSlug is already declared above
 
         const extractedBizName = cleanWordsMapped.length > 0 ? cleanWordsMapped.join(' ') : (bizCategory.charAt(0).toUpperCase() + bizCategory.slice(1));
 
