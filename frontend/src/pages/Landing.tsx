@@ -7,15 +7,16 @@ import CounterStat from '../components/ui/CounterStat';
 import PricingCard from '../components/ui/PricingCard';
 import ComparisonTable from '../components/ui/ComparisonTable';
 import TestimonialCard from '../components/ui/TestimonialCard';
-import WaveBackground from '../components/3d/WaveBackground';
 import PipelineSlides from '../components/ui/PipelineSlides';
-import ParticleNet from '../components/3d/ParticleNet';
-import FogOverlay from '../components/3d/FogOverlay';
 import { FEATURES, TESTIMONIALS } from '../lib/mockData';
 import { HERO_TAGLINES } from '../lib/constants';
-
-// Lazy load heavy 3D components
-const IndiaGlobe = lazy(() => import('../components/3d/IndiaGlobe'));
+// ─── Lazy-load all 3D/heavy background components ───────────────────────────
+// These are decorative — they should not block the initial paint of the page.
+// Each is wrapped in <Suspense fallback={null}> at usage sites.
+const WaveBackground = lazy(() => import('../components/3d/WaveBackground'));
+const ParticleNet   = lazy(() => import('../components/3d/ParticleNet'));
+const FogOverlay    = lazy(() => import('../components/3d/FogOverlay'));
+const IndiaGlobe    = lazy(() => import('../components/3d/IndiaGlobe'));
 
 // ────────────────────────────────────────
 // Morphing tagline in 6 Indian languages
@@ -132,7 +133,7 @@ function ImpactNumbers() {
         <section className="py-20 px-6 lg:px-12 relative overflow-hidden">
             {/* Fog background */}
             <div className="absolute inset-0">
-                <FogOverlay className="absolute inset-0" color="#FF6B35" opacity={0.04} />
+                <Suspense fallback={null}><FogOverlay className="absolute inset-0" color="#FF6B35" opacity={0.04} /></Suspense>
             </div>
 
             <div className="max-w-6xl mx-auto relative z-10">
@@ -331,18 +332,20 @@ export default function Landing() {
 
                 {/* Particle NET animated background — full hero coverage */}
                 <div className="absolute inset-0 pointer-events-none">
-                    <ParticleNet
-                        color="#FF6B35"
-                        pointCount={90}
-                        maxDistance={150}
-                        speed={0.3}
-                        className="absolute inset-0"
-                    />
+                    <Suspense fallback={null}>
+                        <ParticleNet
+                            color="#FF6B35"
+                            pointCount={90}
+                            maxDistance={150}
+                            speed={0.3}
+                            className="absolute inset-0"
+                        />
+                    </Suspense>
                 </div>
 
                 {/* Fog atmosphere overlay */}
                 <div className="absolute inset-0 pointer-events-none opacity-50">
-                    <FogOverlay color="#F7C948" opacity={0.03} className="absolute inset-0" />
+                    <Suspense fallback={null}><FogOverlay color="#F7C948" opacity={0.03} className="absolute inset-0" /></Suspense>
                 </div>
 
                 {/* Radial vignette to keep center readable */}
@@ -421,7 +424,7 @@ export default function Landing() {
                     </motion.div>
                 </div>
 
-                <WaveBackground />
+                <Suspense fallback={null}><WaveBackground /></Suspense>
             </section>
 
             {/* ═══════════════════════════════════════
@@ -440,7 +443,7 @@ export default function Landing() {
             <section className="py-24 px-6 lg:px-12 relative overflow-hidden" style={{ background: 'rgba(13,27,64,0.4)' }}>
                 {/* Subtle particle network in back */}
                 <div className="absolute inset-0 pointer-events-none opacity-20">
-                    <ParticleNet color="#00D4FF" pointCount={50} maxDistance={100} speed={0.15} className="absolute inset-0" />
+                    <Suspense fallback={null}><ParticleNet color="#00D4FF" pointCount={50} maxDistance={100} speed={0.15} className="absolute inset-0" /></Suspense>
                 </div>
 
                 <div className="max-w-5xl mx-auto relative z-10">
@@ -544,7 +547,7 @@ export default function Landing() {
       ═══════════════════════════════════════ */}
             <section id="testimonials" className="py-20 px-6 lg:px-12 relative overflow-hidden" style={{ background: 'rgba(13,27,64,0.4)' }}>
                 <div className="absolute inset-0 pointer-events-none opacity-15">
-                    <FogOverlay color="#F7C948" opacity={0.05} className="absolute inset-0" />
+                    <Suspense fallback={null}><FogOverlay color="#F7C948" opacity={0.05} className="absolute inset-0" /></Suspense>
                 </div>
                 <div className="max-w-5xl mx-auto text-center relative z-10">
                     <h2 className="section-heading">Stories from Bharat</h2>
@@ -562,7 +565,7 @@ export default function Landing() {
       ═══════════════════════════════════════ */}
             <section className="py-24 px-6 text-center relative overflow-hidden">
                 <div className="absolute inset-0 pointer-events-none">
-                    <ParticleNet color="#FF6B35" pointCount={60} maxDistance={120} speed={0.25} className="absolute inset-0" />
+                    <Suspense fallback={null}><ParticleNet color="#FF6B35" pointCount={60} maxDistance={120} speed={0.25} className="absolute inset-0" /></Suspense>
                 </div>
                 <div className="absolute inset-0 pointer-events-none"
                     style={{ background: 'radial-gradient(ellipse 60% 60% at 50% 50%, transparent 30%, rgba(10,15,30,0.9) 100%)' }} />

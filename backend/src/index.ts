@@ -132,8 +132,24 @@ function broadcast(campaignId: string, data: object) {
     clients.forEach(ws => { if (ws.readyState === WebSocket.OPEN) ws.send(msg); });
 }
 
+// ─── WebSocket keepalive — prevents silent drops on slow Bedrock calls ───────
+// AWS App Runner and ALBs terminate idle connections after 60s by default.
+// A 30s ping/pong keeps the pipeline status stream alive for the full ~90s pipeline.
+const WS_PING_INTERVAL = 30_000;
+const heartbeat = setInterval(() => {
+    wss.clients.forEach((ws: any) => {
+        if (ws.isAlive === false) { ws.terminate(); return; }
+        ws.isAlive = false;
+        ws.ping();
+    });
+}, WS_PING_INTERVAL);
+wss.on('close', () => clearInterval(heartbeat));
+
 // WebSocket connection handler
-wss.on('connection', (ws, req) => {
+wss.on('connection', (ws: any, req) => {
+    ws.isAlive = true;
+    ws.on('pong', () => { ws.isAlive = true; });
+
     try {
         const url = new URL(req.url || '', `ws://localhost`);
         const campaignId = url.searchParams.get('campaignId') || '';
@@ -148,7 +164,7 @@ wss.on('connection', (ws, req) => {
             campaignClients.get(campaignId)?.delete(ws);
         });
 
-        ws.on('error', (error) => {
+        ws.on('error', (error: Error) => {
             console.error('WebSocket error:', error);
         });
     } catch (error) {
