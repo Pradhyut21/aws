@@ -80,6 +80,8 @@ export interface CaptionSet {
     youtube: string;
     whatsapp: string;
     linkedin?: string;
+    summary?: string;
+    [key: string]: string | undefined;
 }
 
 export interface VideoScript {
