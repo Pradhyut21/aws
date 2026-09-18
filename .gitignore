@@ -19,6 +19,7 @@ frontend/dist/
 # misc
 .DS_Store
 *.pem
+*.zip
 
 # debug / test output files — never commit
 npm-debug.log*
