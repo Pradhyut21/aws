@@ -10,7 +10,7 @@ coverage
 .next/
 out/
 
-# production / build outputs
+# production / build outputs — never commit compiled JS/CSS/HTML
 build
 dist/
 backend/dist/
@@ -20,7 +20,7 @@ frontend/dist/
 .DS_Store
 *.pem
 
-# debug
+# debug / test output files — never commit
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -29,7 +29,7 @@ backend/bedrock-output.txt
 backend/guardrail-output.json
 benchmark_results.txt
 
-# local env files
+# local env files — NEVER commit real secrets
 .env*.local
 .env
 backend/.env
@@ -41,3 +41,8 @@ frontend/.env
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# editor / OS
+.vscode/
+.kilo/
+Thumbs.db

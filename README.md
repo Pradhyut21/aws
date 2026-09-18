@@ -55,15 +55,39 @@ Campaign Live on Instagram + WhatsApp + Facebook + YouTube
 | Service | Purpose |
 |---------|---------|
 | **Amazon Bedrock Nova Pro** | Research agent, SEO, distribution |
-| **Amazon Bedrock Nova Omni** | Multilingual content generation |
-| **Amazon Bedrock Nova Reel** | 15-second video script generation |
-| **Amazon Bedrock Nova Sonic** | Voice transcription + translation |
+| **Amazon Bedrock Nova Lite** | Multilingual content generation |
+| **Amazon Bedrock Nova Lite** | AI video **script** generation (15-second structured scripts) |
 | **Bedrock Guardrails** | Cultural sensitivity + brand safety |
 | **AWS Lambda** | Agent orchestration |
 | **Amazon DynamoDB** | Campaign + analytics storage |
 | **Amazon S3 + CloudFront** | Generated media storage + CDN |
 | **API Gateway WebSocket** | Real-time pipeline status |
+| **Amazon Polly** | Text-to-speech in 10 Indian languages |
+| **Amazon Translate** | Multilingual caption translation |
+| **Amazon Comprehend** | Sentiment analysis + key phrases |
+| **Amazon Rekognition** | Image content moderation |
 | **AWS Cognito** | User authentication |
+
+---
+
+## ✅ Capabilities — Real vs Demo (Hackathon v1)
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Bedrock content generation (Nova Pro + Lite) | ✅ **Real** | Research, captions, quality check |
+| Titan Image Generator → S3 | ✅ **Real** | Falls back to placeholder on quota |
+| DynamoDB persistence | ✅ **Real** | Campaigns, users, experiments, traces |
+| Amazon Polly TTS | ✅ **Real** | 10 Indian languages via POST /api/voice/synthesize |
+| Amazon Translate | ✅ **Real** | 9 Indian language translations in parallel |
+| Amazon Comprehend | ✅ **Real** | Sentiment + key phrase analysis |
+| Amazon Rekognition | ✅ **Real** | Image content moderation |
+| WebSocket real-time pipeline | ✅ **Real** | With keepalive + SSE fallback |
+| Learning loop (DynamoDB) | ✅ **Real** | Lessons from past campaigns feed next run |
+| A/B Experiment Engine | ✅ **Real** | 3 language variants per campaign |
+| AI Video Script Generation | ✅ **Real** | Structured 15-sec script (Nova Lite) |
+| Voice transcription (mic input) | 🔶 **Demo** | Demo text — production: Amazon Transcribe Streaming |
+| Video file rendering | 🔶 **v2 roadmap** | Needs Nova Reel StartAsyncInvoke + S3 polling |
+| Social media publishing | 🔶 **Demo** | Saves to DB — production: platform OAuth APIs |
 
 ---
 
@@ -77,7 +101,8 @@ Campaign Live on Instagram + WhatsApp + Facebook + YouTube
 
 ```bash
 # Clone the repo
-cd "d:\prototype aws"
+git clone https://github.com/your-username/bharatmedia.git
+cd bharatmedia
 
 # Install all dependencies
 npm install

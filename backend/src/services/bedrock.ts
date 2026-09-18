@@ -114,30 +114,43 @@ export async function invokeNovaOmni(prompt: string, maxTokens: number = 1500): 
     }
 }
 
-// ─── NOVA REEL (Video Script Generation) ──────────────────────────────────
+// ─── AI VIDEO SCRIPT GENERATION (backed by Nova Lite) ─────────────────────
 //
-// ⚠️  HONEST LABEL: Nova Reel (video model) is invoked via the Nova Lite
-// text endpoint because the Nova Reel video-generation API uses a separate
-// async job model (StartAsyncInvoke) and requires a valid S3 output path,
-// making it unsuitable for synchronous request/response in this architecture.
-// The text prompts sent here are still video-script generation prompts;
-// only the rendering step (actual video file) is not performed.
-// Production upgrade path: replace with StartAsyncInvoke + S3 polling.
+// ✅ CAPABILITY: Generates a complete, structured 15-second video script
+//    (hook / story / CTA) using Amazon Nova Lite — ready to hand to a videographer
+//    or video editing tool.
+//
+// ℹ️  NOT included in v1 (hackathon scope): Actual video file rendering.
+//    Amazon Nova Reel's video-generation API uses StartAsyncInvoke (async job
+//    model) and requires a dedicated S3 output bucket + polling loop. This is
+//    a known v2 upgrade path — the script output from this function is the
+//    structured input that StartAsyncInvoke would consume.
+//
+// Production upgrade path:
+//   1. Call bedrock.StartAsyncInvokeCommand with nova-reel model
+//   2. Pass the script text as the prompt
+//   3. Poll S3 for the rendered .mp4 output
 export async function invokeNovaReel(prompt: string, maxTokens: number = 1000): Promise<string> {
-    console.log('🎬 [Nova Reel fallback → Nova Lite] Generating video script text...');
+    console.log('🎬 [Video Script Generator → Nova Lite] Generating structured video script...');
     return await invokeNovaOmni(prompt, maxTokens);
 }
 
-// ─── NOVA SONIC (Voice Transcription & Translation) ────────────────────────
+// ─── DISTRIBUTION COPY GENERATION (backed by Claude) ─────────────────────
 //
-// ⚠️  HONEST LABEL: Nova Sonic is a real-time bidirectional audio streaming
-// model. It requires a WebSocket/HTTP2 streaming connection and cannot be
-// called via the standard InvokeModel REST endpoint used here.
-// For real TTS/voice, this project uses Amazon Polly via POST /api/voice/synthesize.
-// This function is retained for text-level distribution copy generation only.
-// Production upgrade path: integrate Nova Sonic via the Bedrock streaming API.
+// ✅ CAPABILITY: Generates distribution-optimised copy text for social channels.
+//
+// ℹ️  Voice transcription (speech-to-text) uses Amazon Transcribe, not this
+//    function. This function handles text-level copy generation only.
+//
+// ℹ️  Nova Sonic is a real-time bidirectional audio streaming model requiring
+//    a WebSocket/HTTP2 streaming connection — it cannot be called via the
+//    standard InvokeModel REST endpoint. Nova Sonic is on the v2 roadmap.
+//    TTS output today uses Amazon Polly (POST /api/voice/synthesize — real).
+//
+// Production upgrade path:
+//   Replace with Nova Sonic Bedrock Streaming API for real-time voice responses.
 export async function invokeNovaSonic(prompt: string, maxTokens: number = 500): Promise<string> {
-    console.log('🎤 [Nova Sonic fallback → Claude] Generating distribution copy text...');
+    console.log('🎤 [Distribution Copy → Claude] Generating distribution copy text...');
     return await invokeClaude(prompt, maxTokens);
 }
 

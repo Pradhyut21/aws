@@ -24,7 +24,15 @@ import { randomUUID } from 'crypto';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 
-const JWT_SECRET   = process.env.JWT_SECRET   || 'your-secret-key-change-in-production';
+const JWT_SECRET_RAW = process.env.JWT_SECRET;
+if (!JWT_SECRET_RAW) {
+    throw new Error(
+        '[BharatMedia] JWT_SECRET environment variable is required but not set.\n' +
+        '  Generate one with: openssl rand -hex 32\n' +
+        '  Then add it to backend/.env as: JWT_SECRET=<value>'
+    );
+}
+const JWT_SECRET = JWT_SECRET_RAW;
 const JWT_EXPIRY   = '7d';
 const BCRYPT_ROUNDS = 12;
 const TABLE_NAME   = process.env.DYNAMODB_TABLE || 'bharatmedia-dev';
