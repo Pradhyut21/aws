@@ -27,12 +27,16 @@ URL: /
 - 📊 **Animated stats** count up: 22 languages, 15 platforms, 5 AI agents
 - 🎭 **Rural entrepreneur stories** show real use cases (Ramkali, Murugesan, etc.)
 
+![Landing Page UI](./docs/images/prototype_landing_hero.png)
+
 ---
 
 ### Step 2: Create a Campaign (Voice Input)
 ```
 URL: /new-campaign
 ```
+
+![Campaign Creation Studio UI](./docs/images/prototype_campaign_studio.png)
 
 **Voice Input Flow (Real Amazon Transcribe):**
 ```
@@ -63,6 +67,8 @@ Regions: Uttar Pradesh, Delhi
 ```
 URL: /new-campaign → Step 2
 ```
+
+![AI Pipeline Workflow](./docs/images/prototype_how_it_works.png)
 
 The pipeline runs via **real AWS Bedrock calls** with live WebSocket status:
 
@@ -154,6 +160,8 @@ URL: /dashboard
 - 🗓️ Campaign cards with BharatScore badges
 - 📈 Recharts line/pie analytics
 - 🗺️ India state choropleth engagement map
+
+![Dashboard Overview UI](./docs/images/prototype_dashboard.png)
 
 ---
 

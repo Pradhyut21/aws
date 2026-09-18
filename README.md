@@ -2,9 +2,7 @@
 
 # BharatMedia — भारत का AI Content Studio
 
-### *"Speak in your language. Publish to the world."*
-
-![BharatMedia Hero](./docs/images/bharatmedia_hero_banner_1789750675879.jpg)
+![BharatMedia Prototype](./docs/images/prototype_landing_hero.png)
 
 <!-- AWS Service Badges -->
 ![Amazon Bedrock](https://img.shields.io/badge/Amazon%20Bedrock-Nova%20Pro%20%7C%20Nova%20Lite%20%7C%20Titan-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
@@ -116,9 +114,25 @@ You speak → AI listens → Campaign published
 
 ---
 
+## 📸 Real Working Prototype in Action
+
+> *No mockups. No Figma renders. No random AI-generated placeholders. These are direct captures from the actual running React + Express app (`localhost:5173`) powered by live AWS Bedrock and Amazon Transcribe.*
+
+### 🖥️ Multilingual Campaign Creation Studio
+*Voice-first campaign generator with real-time audio transcription (Amazon Transcribe Streaming), 22 Indian language selectors, regional tone controls, and autonomous agent coordination.*
+
+![BharatMedia Campaign Creation Studio](./docs/images/prototype_campaign_studio.png)
+
+### 📊 Live Analytics & Campaign Hub
+*Unified mission control showing real-time campaigns, BharatScore™ cultural evaluations, reach projections, and quick-launch actions.*
+
+![BharatMedia Dashboard](./docs/images/prototype_dashboard.png)
+
+---
+
 ## 🤖 The AI Pipeline
 
-![Agent Pipeline](./docs/images/agent_pipeline_diagram_1789750686058.jpg)
+![Live Multi-Agent Flow](./docs/images/prototype_how_it_works.png)
 
 ### How it works — real, not simulated
 
@@ -169,7 +183,7 @@ When you speak or type your campaign brief, **5 AI agents activate in sequence**
 
 ## ☁️ AWS Services — 10 Real Integrations
 
-![AWS Services](./docs/images/aws_services_grid_1789750720097.jpg)
+![BharatMedia Core Engine & Features](./docs/images/prototype_features.png)
 
 | # | Service | What BharatMedia uses it for | Endpoint |
 |---|---------|------------------------------|---------|
@@ -322,11 +336,13 @@ npm run dev
 
 ## 📱 Feature Tour
 
-### 🌐 Landing Page
+### 🌐 Landing Page & Entrepreneur Showcase
 - 3D India globe (Three.js) with glowing state markers
 - Multilingual tagline morphing through 6 languages every 2.8s
-- Rural entrepreneur stories (Ramkali, Murugesan, Priya...)
-- Live stats counters
+- Real rural entrepreneur stories (Ramkali, Murugesan, Priya...)
+- Live stats counters & accessible pricing tiers
+
+![Entrepreneur Stories & Pricing](./docs/images/prototype_pricing_stories.png)
 
 ### ✍️ Campaign Creation
 - **Voice mode**: Speak in your language → Amazon Transcribe → auto-filled
