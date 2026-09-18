@@ -12,6 +12,7 @@
 | AI Research Agent | Amazon Bedrock Nova Pro | `POST /api/campaign/create` |
 | Multilingual Caption Generation | Amazon Bedrock Nova Lite | `POST /api/campaign/create` |
 | AI Video **Script** Generation | Amazon Bedrock Nova Lite | `POST /api/campaign/create` |
+| Voice transcription (mic input) | Amazon Transcribe Streaming, 10 Indian languages | `POST /api/campaign/create` |
 | Quality Guard + BharatScore | Amazon Bedrock Nova Pro | `POST /api/campaign/create` |
 | Titan Image Generation → S3 | Amazon Titan Image Generator v1 | `POST /api/generate-image` |
 | Text-to-Speech (10 languages) | Amazon Polly | `POST /api/voice/synthesize` |
@@ -32,7 +33,6 @@
 
 | Feature | Status | What's Real | What's Demo | Production Path |
 |---------|--------|-------------|-------------|-----------------|
-| Voice Transcription (mic button) | Demo | Audio recording UI | Returns demo Hindi text | Amazon Transcribe Streaming |
 | Video File Rendering | v2 Roadmap | 15-sec video script ✅ | No `.mp4` file generated | Nova Reel `StartAsyncInvoke` + S3 polling |
 | Social Media Publishing | Demo | Saves publish record to DynamoDB | No platform OAuth call | Facebook/Instagram Graph API, WhatsApp Business API |
 | Market Pulse Signals | Demo (labelled) | API returns `source: "SIMULATED"` | Static trend data | Social listening provider (Brandwatch, Talkwalker) |

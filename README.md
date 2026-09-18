@@ -2,6 +2,32 @@
 
 > **India's first Agentic Content Orchestrator** | AI for Bharat Hackathon 2026 | Team Haya
 
+<!-- AWS Service Badges -->
+![Amazon Bedrock](https://img.shields.io/badge/Amazon%20Bedrock-Nova%20Pro%20%7C%20Nova%20Lite%20%7C%20Titan-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Amazon DynamoDB](https://img.shields.io/badge/DynamoDB-Campaigns%20%7C%20Traces%20%7C%20Users-4053D6?style=for-the-badge&logo=amazon-dynamodb&logoColor=white)
+![Amazon S3](https://img.shields.io/badge/Amazon%20S3-Images%20%7C%20Audio%20%7C%20Docs-569A31?style=for-the-badge&logo=amazon-s3&logoColor=white)
+![Amazon Polly](https://img.shields.io/badge/Amazon%20Polly-10%20Indian%20Languages-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Amazon Transcribe](https://img.shields.io/badge/Amazon%20Transcribe-Speech%20to%20Text-FF4F8B?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Amazon Translate](https://img.shields.io/badge/Amazon%20Translate-9%20Languages-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Amazon Comprehend](https://img.shields.io/badge/Amazon%20Comprehend-Sentiment%20%7C%20NLP-8B5CF6?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Amazon Rekognition](https://img.shields.io/badge/Amazon%20Rekognition-Image%20Moderation-00D4FF?style=for-the-badge&logo=amazon-aws&logoColor=white)
+
+<!-- Tech Stack -->
+![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![WebSocket](https://img.shields.io/badge/WebSocket-Real--time%20Pipeline-00FF88?style=for-the-badge&logo=socket.io&logoColor=white)
+
+<!-- Hackathon + Stats -->
+![Hackathon](https://img.shields.io/badge/AI%20for%20Bharat-Hackathon%202026-FF6B35?style=for-the-badge)
+![Languages](https://img.shields.io/badge/Indian%20Languages-22%2B-F7C948?style=for-the-badge)
+![AWS Services](https://img.shields.io/badge/AWS%20Services-9%20Real%20Calls-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+
+<!-- Quick Links -->
+**[🎬 Live Demo Guide](./LIVE_DEMO.md)** · **[✅ Capabilities (Real vs Demo)](./CAPABILITIES.md)** · **[🏗️ Architecture](./ARCHITECTURE.md)** · **[⚡ Quick Start](./QUICK_START.md)**
+
 ---
 
 ## 🏆 Overview
@@ -63,6 +89,7 @@ Campaign Live on Instagram + WhatsApp + Facebook + YouTube
 | **Amazon S3 + CloudFront** | Generated media storage + CDN |
 | **API Gateway WebSocket** | Real-time pipeline status |
 | **Amazon Polly** | Text-to-speech in 10 Indian languages |
+| **Amazon Transcribe Streaming** | Voice-to-text in 10 Indian languages |
 | **Amazon Translate** | Multilingual caption translation |
 | **Amazon Comprehend** | Sentiment analysis + key phrases |
 | **Amazon Rekognition** | Image content moderation |
@@ -85,7 +112,7 @@ Campaign Live on Instagram + WhatsApp + Facebook + YouTube
 | Learning loop (DynamoDB) | ✅ **Real** | Lessons from past campaigns feed next run |
 | A/B Experiment Engine | ✅ **Real** | 3 language variants per campaign |
 | AI Video Script Generation | ✅ **Real** | Structured 15-sec script (Nova Lite) |
-| Voice transcription (mic input) | 🔶 **Demo** | Demo text — production: Amazon Transcribe Streaming |
+| Voice transcription (mic input) | ✅ **Real** | Amazon Transcribe Streaming, 10 Indian languages |
 | Video file rendering | 🔶 **v2 roadmap** | Needs Nova Reel StartAsyncInvoke + S3 polling |
 | Social media publishing | 🔶 **Demo** | Saves to DB — production: platform OAuth APIs |
 

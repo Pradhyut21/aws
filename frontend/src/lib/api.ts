@@ -123,11 +123,25 @@ export const getAnalytics = async (): Promise<AnalyticsData> => {
 
 // ─── VOICE ENDPOINTS ───────────────────────────────────────────────────────
 
-export const transcribeVoice = async (audioBlob: Blob): Promise<{ transcription: string; detectedLanguage: string }> => {
+export const transcribeVoice = async (
+    audioBlob: Blob,
+    language: string = 'hi'
+): Promise<{
+    transcription: string;
+    detectedLanguage: string;
+    languageName: string;
+    confidence: number;
+    source: 'amazon_transcribe' | 'DEMO_FALLBACK' | 'DEMO';
+    note?: string;
+    service?: string;
+    durationMs?: number;
+}> => {
     const formData = new FormData();
-    formData.append('audio', audioBlob);
+    formData.append('audio', audioBlob, 'recording.webm');
+    formData.append('language', language);
     const res = await api.post('/voice/transcribe', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 60000, // Transcribe can take up to 30s for longer recordings
     });
     return res.data;
 };
