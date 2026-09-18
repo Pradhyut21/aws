@@ -1,0 +1,196 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #0A0F1E;
+    --bg-secondary: #0D1B40;
+    --accent-saffron: #FF6B35;
+    --accent-gold: #F7C948;
+    --accent-cyan: #00D4FF;
+    --accent-green: #00FF88;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: #F5F5F5;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--accent-saffron), var(--accent-gold));
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(13, 27, 64, 0.5);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #FF6B35, #F7C948);
+    border-radius: 3px;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #FF6B35, #F7C948);
+  }
+
+  .gradient-text-cyan {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #00D4FF, #00FF88);
+  }
+
+  .glass-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 rounded-xl font-semibold font-poppins transition-all duration-300;
+    background: linear-gradient(135deg, #FF6B35, #F7C948);
+    color: #0A0F1E;
+    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 107, 53, 0.5);
+  }
+
+  .btn-outline {
+    @apply px-6 py-3 rounded-xl font-semibold font-poppins transition-all duration-300 border;
+    border-color: rgba(255, 107, 53, 0.5);
+    color: #FF6B35;
+    background: transparent;
+  }
+
+  .btn-outline:hover {
+    background: rgba(255, 107, 53, 0.1);
+    border-color: #FF6B35;
+    transform: translateY(-2px);
+  }
+
+  .glow-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #FF6B35;
+    box-shadow: 0 0 10px #FF6B35, 0 0 20px #F7C948;
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  .section-heading {
+    @apply text-4xl md:text-5xl font-bold font-poppins gradient-text mb-4;
+  }
+
+  .feature-card {
+    @apply glass-card p-6 transition-all duration-300 cursor-pointer;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    border-color: rgba(255, 107, 53, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 107, 53, 0.1);
+  }
+}
+
+/* Particle canvas */
+#globe-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Animated gradient border */
+.gradient-border {
+  position: relative;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(135deg, #FF6B35, #F7C948, #00D4FF);
+}
+
+.gradient-border>* {
+  border-radius: 15px;
+  background: var(--bg-primary);
+}
+
+/* Recording pulse ring */
+@keyframes recordPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.record-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: rgba(255, 50, 50, 0.4);
+  animation: recordPulse 1.5s ease-out infinite;
+}
+
+/* Agent node glow */
+.agent-active {
+  box-shadow: 0 0 20px rgba(255, 107, 53, 0.8), 0 0 40px rgba(247, 201, 72, 0.4);
+  border-color: #FF6B35 !important;
+}
+
+/* Waveform bars */
+.waveform-bar {
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(to top, #FF6B35, #F7C948);
+  transition: height 0.1s ease;
+}
+
+/* Indian flag colors stripe */
+.india-stripe {
+  background: linear-gradient(to right, #FF6B35 33%, #FFFFFF 33%, #FFFFFF 66%, #138808 66%);
+  height: 3px;
+}
