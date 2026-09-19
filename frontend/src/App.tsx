@@ -3,8 +3,9 @@ import { Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.tsx';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import Landing from './pages/Landing';
 import CommandPalette from './components/ui/CommandPalette';
+
+const Landing = lazy(() => import('./pages/Landing'));
 
 const Signup = lazy(() => import('./pages/Signup'));
 const Login = lazy(() => import('./pages/Login'));
