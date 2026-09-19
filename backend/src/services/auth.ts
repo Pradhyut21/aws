@@ -22,25 +22,30 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand, GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import {
+    DynamoDBDocumentClient,
+    PutCommand,
+    GetCommand,
+    QueryCommand,
+} from '@aws-sdk/lib-dynamodb';
 
 const JWT_SECRET_RAW = process.env.JWT_SECRET;
 if (!JWT_SECRET_RAW) {
     throw new Error(
         '[BharatMedia] JWT_SECRET environment variable is required but not set.\n' +
-        '  Generate one with: openssl rand -hex 32\n' +
-        '  Then add it to backend/.env as: JWT_SECRET=<value>'
+            '  Generate one with: openssl rand -hex 32\n' +
+            '  Then add it to backend/.env as: JWT_SECRET=<value>'
     );
 }
 const JWT_SECRET = JWT_SECRET_RAW;
-const JWT_EXPIRY   = '7d';
+const JWT_EXPIRY = '7d';
 const BCRYPT_ROUNDS = 12;
-const TABLE_NAME   = process.env.DYNAMODB_TABLE || 'bharatmedia-dev';
-const REGION       = process.env.AWS_REGION     || 'us-east-1';
+const TABLE_NAME = process.env.DYNAMODB_TABLE || 'bharatmedia-dev';
+const REGION = process.env.AWS_REGION || 'us-east-1';
 
 const rawClient = new DynamoDBClient({ region: REGION });
 const ddb = DynamoDBDocumentClient.from(rawClient, {
-    marshallOptions:   { removeUndefinedValues: true },
+    marshallOptions: { removeUndefinedValues: true },
     unmarshallOptions: { wrapNumbers: false },
 });
 
@@ -80,11 +85,7 @@ export async function hashPassword(password: string): Promise<string> {
 }
 
 export function generateToken(user: User): string {
-    return jwt.sign(
-        { userId: user.id, email: user.email },
-        JWT_SECRET,
-        { expiresIn: JWT_EXPIRY }
-    );
+    return jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
 }
 
 export function verifyToken(token: string): AuthToken | null {
@@ -109,56 +110,64 @@ export async function createUser(
     businessType: string = 'other',
     region: string[] = []
 ): Promise<User> {
-    const userId       = randomUUID();
+    const userId = randomUUID();
     const hashedPassword = await hashPassword(password);
-    const now          = new Date().toISOString();
+    const now = new Date().toISOString();
 
     const userRecord = {
-        id:           userId,
+        id: userId,
         email,
-        password:     hashedPassword,
+        password: hashedPassword,
         name,
-        language:     language || 'hi',
+        language: language || 'hi',
         businessType,
         region,
-        tier:         'free' as const,
-        createdAt:    now,
-        updatedAt:    now,
+        tier: 'free' as const,
+        createdAt: now,
+        updatedAt: now,
     };
 
-    await ddb.send(new PutCommand({
-        TableName: TABLE_NAME,
-        Item: {
-            PK:    `USER#${userId}`,
-            SK:    `USER#${userId}`,
-            _type: 'user',
-            ...userRecord,
-        },
-        ConditionExpression: 'attribute_not_exists(PK)',
-    }));
+    await ddb.send(
+        new PutCommand({
+            TableName: TABLE_NAME,
+            Item: {
+                PK: `USER#${userId}`,
+                SK: `USER#${userId}`,
+                _type: 'user',
+                ...userRecord,
+            },
+            ConditionExpression: 'attribute_not_exists(PK)',
+        })
+    );
 
     const { password: _, ...userWithoutPassword } = userRecord;
     return userWithoutPassword;
 }
 
 /** Returns the full user record including hashed password (for login verification) */
-export async function getUserByEmail(email: string): Promise<(User & { password: string }) | undefined> {
-    const result = await ddb.send(new QueryCommand({
-        TableName:              TABLE_NAME,
-        IndexName:              'EmailIndex',
-        KeyConditionExpression: 'email = :email',
-        ExpressionAttributeValues: { ':email': email },
-        Limit: 1,
-    }));
+export async function getUserByEmail(
+    email: string
+): Promise<(User & { password: string }) | undefined> {
+    const result = await ddb.send(
+        new QueryCommand({
+            TableName: TABLE_NAME,
+            IndexName: 'EmailIndex',
+            KeyConditionExpression: 'email = :email',
+            ExpressionAttributeValues: { ':email': email },
+            Limit: 1,
+        })
+    );
     if (!result.Items || result.Items.length === 0) return undefined;
     return stripMeta(result.Items[0]) as User & { password: string };
 }
 
 export async function getUserById(userId: string): Promise<User | undefined> {
-    const result = await ddb.send(new GetCommand({
-        TableName: TABLE_NAME,
-        Key: { PK: `USER#${userId}`, SK: `USER#${userId}` },
-    }));
+    const result = await ddb.send(
+        new GetCommand({
+            TableName: TABLE_NAME,
+            Key: { PK: `USER#${userId}`, SK: `USER#${userId}` },
+        })
+    );
     if (!result.Item) return undefined;
     const item = stripMeta(result.Item);
     const { password, ...userWithoutPassword } = item;
@@ -167,24 +176,28 @@ export async function getUserById(userId: string): Promise<User | undefined> {
 
 export async function updateUser(userId: string, updates: Partial<User>): Promise<User | null> {
     // Fetch including password so we can re-write the full item safely
-    const result = await ddb.send(new GetCommand({
-        TableName: TABLE_NAME,
-        Key: { PK: `USER#${userId}`, SK: `USER#${userId}` },
-    }));
+    const result = await ddb.send(
+        new GetCommand({
+            TableName: TABLE_NAME,
+            Key: { PK: `USER#${userId}`, SK: `USER#${userId}` },
+        })
+    );
     if (!result.Item) return null;
     const existing = stripMeta(result.Item);
 
     const updated = { ...existing, ...updates, updatedAt: new Date().toISOString() };
 
-    await ddb.send(new PutCommand({
-        TableName: TABLE_NAME,
-        Item: {
-            PK:    `USER#${userId}`,
-            SK:    `USER#${userId}`,
-            _type: 'user',
-            ...updated,
-        },
-    }));
+    await ddb.send(
+        new PutCommand({
+            TableName: TABLE_NAME,
+            Item: {
+                PK: `USER#${userId}`,
+                SK: `USER#${userId}`,
+                _type: 'user',
+                ...updated,
+            },
+        })
+    );
 
     const { password, ...userWithoutPassword } = updated;
     return userWithoutPassword as User;

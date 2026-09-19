@@ -6,7 +6,11 @@ interface FogOverlayProps {
     opacity?: number;
 }
 
-export default function FogOverlay({ className = '', color = '#FF6B35', opacity = 0.06 }: FogOverlayProps) {
+export default function FogOverlay({
+    className = '',
+    color = '#FF6B35',
+    opacity = 0.06,
+}: FogOverlayProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animRef = useRef<number>(0);
 
@@ -16,7 +20,15 @@ export default function FogOverlay({ className = '', color = '#FF6B35', opacity 
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        type Puff = { x: number; y: number; r: number; vx: number; vy: number; alpha: number; growing: boolean };
+        type Puff = {
+            x: number;
+            y: number;
+            r: number;
+            vx: number;
+            vy: number;
+            alpha: number;
+            growing: boolean;
+        };
         const puffs: Puff[] = [];
 
         const resize = () => {

@@ -1,14 +1,17 @@
 import { useEffect, useRef } from 'react';
 
 interface Particle {
-    x: number; y: number;
-    vx: number; vy: number;
-    size: number; opacity: number;
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    size: number;
+    opacity: number;
 }
 
 interface ParticleNetProps {
     className?: string;
-    color?: string;  // hex like '#FF6B35'
+    color?: string; // hex like '#FF6B35'
     pointCount?: number;
     maxDistance?: number;
     speed?: number;
@@ -16,7 +19,9 @@ interface ParticleNetProps {
 
 function hexToRgb(hex: string) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? `${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)}` : '255,107,53';
+    return result
+        ? `${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)}`
+        : '255,107,53';
 }
 
 export default function ParticleNet({
@@ -109,7 +114,9 @@ export default function ParticleNet({
             const rect = canvas.getBoundingClientRect();
             mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
         };
-        const handleMouseLeave = () => { mouseRef.current = { x: -9999, y: -9999 }; };
+        const handleMouseLeave = () => {
+            mouseRef.current = { x: -9999, y: -9999 };
+        };
 
         window.addEventListener('resize', resize);
         canvas.addEventListener('mousemove', handleMouseMove);

@@ -10,10 +10,11 @@ interface CampaignCardProps {
 
 const PLATFORM_SHARE: Record<string, (caption: string, imgUrl: string) => string> = {
     instagram: () => `https://www.instagram.com/`,
-    facebook: (caption) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://bharatmedia.in')}&quote=${encodeURIComponent(caption)}`,
-    whatsapp: (caption) => `https://wa.me/?text=${encodeURIComponent(caption)}`,
+    facebook: caption =>
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://bharatmedia.in')}&quote=${encodeURIComponent(caption)}`,
+    whatsapp: caption => `https://wa.me/?text=${encodeURIComponent(caption)}`,
     youtube: () => `https://studio.youtube.com/`,
-    twitter: (caption) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(caption)}`,
+    twitter: caption => `https://twitter.com/intent/tweet?text=${encodeURIComponent(caption)}`,
 };
 
 export default function CampaignCard({ item, onCopy, onPublish }: CampaignCardProps) {
@@ -38,8 +39,11 @@ export default function CampaignCard({ item, onCopy, onPublish }: CampaignCardPr
     };
 
     const platformColors: Record<string, string> = {
-        instagram: '#E1306C', facebook: '#1877F2',
-        whatsapp: '#25D366', youtube: '#FF0000', twitter: '#1DA1F2',
+        instagram: '#E1306C',
+        facebook: '#1877F2',
+        whatsapp: '#25D366',
+        youtube: '#FF0000',
+        twitter: '#1DA1F2',
     };
     const color = platformColors[item.platform] || '#FF6B35';
 
@@ -53,7 +57,10 @@ export default function CampaignCard({ item, onCopy, onPublish }: CampaignCardPr
             transition={{ duration: 0.2 }}
         >
             {/* Image */}
-            <div className="relative overflow-hidden h-48" style={{ background: imgError ? fallbackBg : undefined }}>
+            <div
+                className="relative overflow-hidden h-48"
+                style={{ background: imgError ? fallbackBg : undefined }}
+            >
                 {!imgError ? (
                     <img
                         src={item.url}
@@ -63,8 +70,19 @@ export default function CampaignCard({ item, onCopy, onPublish }: CampaignCardPr
                         loading="lazy"
                     />
                 ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center gap-2" style={{ background: fallbackBg }}>
-                        <span className="text-4xl">{item.platform === 'instagram' ? '📸' : item.platform === 'whatsapp' ? '💬' : item.platform === 'youtube' ? '🎬' : '📢'}</span>
+                    <div
+                        className="w-full h-full flex flex-col items-center justify-center gap-2"
+                        style={{ background: fallbackBg }}
+                    >
+                        <span className="text-4xl">
+                            {item.platform === 'instagram'
+                                ? '📸'
+                                : item.platform === 'whatsapp'
+                                  ? '💬'
+                                  : item.platform === 'youtube'
+                                    ? '🎬'
+                                    : '📢'}
+                        </span>
                         <span className="text-xs text-slate-400 capitalize">{item.platform}</span>
                     </div>
                 )}
@@ -94,7 +112,10 @@ export default function CampaignCard({ item, onCopy, onPublish }: CampaignCardPr
                 <button
                     onClick={handleCopy}
                     className="flex-1 py-2 text-sm rounded-lg font-medium transition-all"
-                    style={{ background: 'rgba(255,255,255,0.06)', color: copied ? '#00FF88' : '#F5F5F5' }}
+                    style={{
+                        background: 'rgba(255,255,255,0.06)',
+                        color: copied ? '#00FF88' : '#F5F5F5',
+                    }}
                 >
                     {copied ? '✅ Copied!' : '📋 Copy'}
                 </button>

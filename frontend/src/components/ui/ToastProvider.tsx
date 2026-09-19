@@ -23,10 +23,22 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         }, duration);
     }, []);
 
-    const success = useCallback((message: string, duration = 3000) => showToast(message, 'success', duration), [showToast]);
-    const error = useCallback((message: string, duration = 3000) => showToast(message, 'error', duration), [showToast]);
-    const info = useCallback((message: string, duration = 3000) => showToast(message, 'info', duration), [showToast]);
-    const warning = useCallback((message: string, duration = 3000) => showToast(message, 'warning', duration), [showToast]);
+    const success = useCallback(
+        (message: string, duration = 3000) => showToast(message, 'success', duration),
+        [showToast]
+    );
+    const error = useCallback(
+        (message: string, duration = 3000) => showToast(message, 'error', duration),
+        [showToast]
+    );
+    const info = useCallback(
+        (message: string, duration = 3000) => showToast(message, 'info', duration),
+        [showToast]
+    );
+    const warning = useCallback(
+        (message: string, duration = 3000) => showToast(message, 'warning', duration),
+        [showToast]
+    );
 
     const handleDismiss = useCallback((id: string) => {
         setToasts(prev => prev.filter(t => t.id !== id));
@@ -35,7 +47,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     return (
         <ToastContext.Provider value={{ showToast, success, error, info, warning }}>
             {children}
-            <ToastContainer toasts={toasts.map(t => ({ ...t, onDismiss: handleDismiss }))} onDismiss={handleDismiss} />
+            <ToastContainer
+                toasts={toasts.map(t => ({ ...t, onDismiss: handleDismiss }))}
+                onDismiss={handleDismiss}
+            />
         </ToastContext.Provider>
     );
 }

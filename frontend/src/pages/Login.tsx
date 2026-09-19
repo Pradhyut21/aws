@@ -24,11 +24,14 @@ export default function Login() {
         }
 
         // Setup a mock local session
-        localStorage.setItem('bm_user', JSON.stringify({
-            name: email.split('@')[0],
-            email: email,
-            avatar: `https://api.dicebear.com/7.x/notionists/svg?seed=${email}`
-        }));
+        localStorage.setItem(
+            'bm_user',
+            JSON.stringify({
+                name: email.split('@')[0],
+                email: email,
+                avatar: `https://api.dicebear.com/7.x/notionists/svg?seed=${email}`,
+            })
+        );
 
         setLoading(false);
         navigate('/dashboard');
@@ -58,8 +61,11 @@ export default function Login() {
                 <div className="glass-card p-8">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {error && (
-                            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                                className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-400 text-sm flex items-center gap-2">
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-400 text-sm flex items-center gap-2"
+                            >
                                 <span>⚠️</span> {error}
                             </motion.div>
                         )}
@@ -71,7 +77,7 @@ export default function Login() {
                             <input
                                 type="email"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={e => setEmail(e.target.value)}
                                 className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700/50 rounded-xl text-white focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all font-medium"
                                 placeholder="you@company.com"
                                 required
@@ -83,12 +89,17 @@ export default function Login() {
                                 <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
                                     Password
                                 </label>
-                                <a href="#" className="text-xs text-orange-400 hover:text-orange-300 font-medium">Forgot?</a>
+                                <a
+                                    href="#"
+                                    className="text-xs text-orange-400 hover:text-orange-300 font-medium"
+                                >
+                                    Forgot?
+                                </a>
                             </div>
                             <input
                                 type="password"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={e => setPassword(e.target.value)}
                                 className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700/50 rounded-xl text-white focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all font-medium"
                                 placeholder="••••••••"
                                 required
@@ -114,7 +125,10 @@ export default function Login() {
                     <div className="mt-6 pt-6 border-t border-white/5 text-center">
                         <p className="text-slate-400 text-sm">
                             Don't have an account?{' '}
-                            <Link to="/signup" className="text-orange-400 hover:text-orange-300 font-bold transition-colors">
+                            <Link
+                                to="/signup"
+                                className="text-orange-400 hover:text-orange-300 font-bold transition-colors"
+                            >
                                 Sign up for free
                             </Link>
                         </p>
@@ -122,7 +136,10 @@ export default function Login() {
                 </div>
 
                 <div className="mt-8 text-center">
-                    <Link to="/" className="text-slate-500 hover:text-white text-sm font-medium transition-colors">
+                    <Link
+                        to="/"
+                        className="text-slate-500 hover:text-white text-sm font-medium transition-colors"
+                    >
                         ← Back to home
                     </Link>
                 </div>

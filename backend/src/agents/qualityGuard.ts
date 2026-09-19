@@ -46,7 +46,8 @@ export interface QualityOutput {
 
 const qualityTool = tool<{ content: object }, QualityOutput>({
     name: 'check_content_quality',
-    description: 'Check generated campaign content for safety, cultural sensitivity, brand policy, and factual claims',
+    description:
+        'Check generated campaign content for safety, cultural sensitivity, brand policy, and factual claims',
     handler: async ({ content }) => {
         const contentStr = JSON.stringify(content);
         const safety = await checkContentSafety(contentStr, 'hi');
@@ -55,9 +56,9 @@ const qualityTool = tool<{ content: object }, QualityOutput>({
 
         // Derive per-category status from safety analysis
         const hasCultural = safety.issues.some(i => /cultural|region|offens/i.test(i));
-        const hasHate     = safety.issues.some(i => /hate|discriminat|communal/i.test(i));
-        const hasToxic    = safety.issues.some(i => /toxic|abuse|explicit/i.test(i));
-        const hasClaim    = safety.issues.some(i => /claim|guarantee|best in|#1/i.test(i));
+        const hasHate = safety.issues.some(i => /hate|discriminat|communal/i.test(i));
+        const hasToxic = safety.issues.some(i => /toxic|abuse|explicit/i.test(i));
+        const hasClaim = safety.issues.some(i => /claim|guarantee|best in|#1/i.test(i));
 
         // BharatScore breakdown — documented formula:
         //   culturalFit          = score × 0.30  (cultural appropriateness)
@@ -65,28 +66,34 @@ const qualityTool = tool<{ content: object }, QualityOutput>({
         //   engagementPotential  = score × 0.25  (hook, CTA, emotion)
         //   platformOptimization = score × 0.20  (format fit per platform)
         const bharatScore = {
-            total:               score,
-            culturalFit:         Math.round(score * 0.30),
-            seoScore:            Math.round(score * 0.25),
+            total: score,
+            culturalFit: Math.round(score * 0.3),
+            seoScore: Math.round(score * 0.25),
             engagementPotential: Math.round(score * 0.25),
-            platformOptimization: Math.round(score * 0.20),
+            platformOptimization: Math.round(score * 0.2),
         };
 
         const revisionSuggestions: string[] = [];
-        if (hasClaim)    revisionSuggestions.push('Remove or qualify superlative claims — add evidence or change to "one of the best"');
-        if (hasCultural) revisionSuggestions.push('Review cultural references — ensure they are appropriate for all regions in the campaign');
-        if (score < 70)  revisionSuggestions.push('Strengthen the CTA and reduce generic language');
+        if (hasClaim)
+            revisionSuggestions.push(
+                'Remove or qualify superlative claims — add evidence or change to "one of the best"'
+            );
+        if (hasCultural)
+            revisionSuggestions.push(
+                'Review cultural references — ensure they are appropriate for all regions in the campaign'
+            );
+        if (score < 70) revisionSuggestions.push('Strengthen the CTA and reduce generic language');
 
         return {
-            passed:   safety.safe && score >= 70,
+            passed: safety.safe && score >= 70,
             bharatScore,
-            flags:    safety.issues,
+            flags: safety.issues,
             categories: {
-                toxicity:     hasToxic    ? 'FAIL' : 'PASS',
-                hate:         hasHate     ? 'FAIL' : 'PASS',
-                brand:        'PASS',   // Would use real Guardrail API brand policy check
-                cultural:     hasCultural ? 'FAIL' : 'PASS',
-                factualClaims: hasClaim   ? 'WARN' : 'PASS',
+                toxicity: hasToxic ? 'FAIL' : 'PASS',
+                hate: hasHate ? 'FAIL' : 'PASS',
+                brand: 'PASS', // Would use real Guardrail API brand policy check
+                cultural: hasCultural ? 'FAIL' : 'PASS',
+                factualClaims: hasClaim ? 'WARN' : 'PASS',
             },
             revisionSuggestions,
         };
@@ -95,14 +102,17 @@ const qualityTool = tool<{ content: object }, QualityOutput>({
 
 export async function runQualityGuard(content: object): Promise<QualityOutput> {
     const agent = new Agent({
-        modelId:   'us.amazon.nova-pro-v1:0',
+        modelId: 'us.amazon.nova-pro-v1:0',
         maxTokens: 600,
     });
     agent.registerTool(qualityTool);
 
     try {
-        const output = await agent.invoke(JSON.stringify({ content })) as QualityOutput;
-        logger.info('Quality Guard completed', { bharatScore: output.bharatScore.total, passed: output.passed });
+        const output = (await agent.invoke(JSON.stringify({ content }))) as QualityOutput;
+        logger.info('Quality Guard completed', {
+            bharatScore: output.bharatScore.total,
+            passed: output.passed,
+        });
         return output;
     } catch (error: unknown) {
         logger.error('Quality guard error — using safe fallback', {
@@ -110,9 +120,21 @@ export async function runQualityGuard(content: object): Promise<QualityOutput> {
         });
         return {
             passed: true,
-            bharatScore: { total: 82, culturalFit: 25, seoScore: 20, engagementPotential: 20, platformOptimization: 17 },
+            bharatScore: {
+                total: 82,
+                culturalFit: 25,
+                seoScore: 20,
+                engagementPotential: 20,
+                platformOptimization: 17,
+            },
             flags: [],
-            categories: { toxicity: 'PASS', hate: 'PASS', brand: 'PASS', cultural: 'PASS', factualClaims: 'PASS' },
+            categories: {
+                toxicity: 'PASS',
+                hate: 'PASS',
+                brand: 'PASS',
+                cultural: 'PASS',
+                factualClaims: 'PASS',
+            },
             revisionSuggestions: [],
         };
     }

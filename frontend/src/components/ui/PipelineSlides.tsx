@@ -21,7 +21,8 @@ const SLIDES: Slide[] = [
         aws: 'Nova Sonic',
         color: '#00D4FF',
         title: 'Speak or Type — Any Language',
-        description: 'Your journey starts with a simple idea. Voice it out in Hindi, Tamil, Bhojpuri, or any of 22 Indian languages.',
+        description:
+            'Your journey starts with a simple idea. Voice it out in Hindi, Tamil, Bhojpuri, or any of 22 Indian languages.',
         details: [
             'Voice input transcribed by Nova Sonic',
             'Auto language detection from Unicode script',
@@ -37,7 +38,8 @@ const SLIDES: Slide[] = [
         aws: 'Nova Pro',
         color: '#A855F7',
         title: 'Research Agent Analyzes Your Market',
-        description: 'Nova Pro dives into hyperlocal trends, competitor content, festival calendars, and optimal demographics for your region.',
+        description:
+            'Nova Pro dives into hyperlocal trends, competitor content, festival calendars, and optimal demographics for your region.',
         details: [
             'Regional trend analysis (state-level)',
             'Peak posting time recommendations',
@@ -53,7 +55,8 @@ const SLIDES: Slide[] = [
         aws: 'Nova Omni + Nova Reel',
         color: '#FF6B35',
         title: 'Creative Swarm Builds Your Campaign',
-        description: 'A swarm of AI agents generates captions, images, 15-second reels with local music, and SEO-optimized keywords — all in your native language.',
+        description:
+            'A swarm of AI agents generates captions, images, 15-second reels with local music, and SEO-optimized keywords — all in your native language.',
         details: [
             'Native-script captions (not romanized)',
             '4 AI-generated images per campaign',
@@ -69,7 +72,8 @@ const SLIDES: Slide[] = [
         aws: 'Bedrock Guardrails',
         color: '#F7C948',
         title: 'Quality Guard Checks Every Word',
-        description: 'Bedrock Guardrails reviews all generated content for cultural sensitivity, religious appropriateness, and brand safety across 22 languages.',
+        description:
+            'Bedrock Guardrails reviews all generated content for cultural sensitivity, religious appropriateness, and brand safety across 22 languages.',
         details: [
             'Cultural sensitivity validation',
             'Religious & regional appropriateness',
@@ -85,7 +89,8 @@ const SLIDES: Slide[] = [
         aws: 'Nova Sonic + DynamoDB',
         color: '#00FF88',
         title: 'Distribution Agent Publishes Everywhere',
-        description: 'Your campaign is scheduled at peak engagement times across 15 platforms. Regional influencers are matched. Analytics start tracking.',
+        description:
+            'Your campaign is scheduled at peak engagement times across 15 platforms. Regional influencers are matched. Analytics start tracking.',
         details: [
             'AI-optimal posting times per platform',
             '15 social platforms supported',
@@ -106,10 +111,13 @@ export default function PipelineSlides({ autoPlay = true, interval = 3500 }: Pip
     const [direction, setDirection] = useState(1);
     const [paused, setPaused] = useState(false);
 
-    const goTo = useCallback((idx: number) => {
-        setDirection(idx > active ? 1 : -1);
-        setActive(idx);
-    }, [active]);
+    const goTo = useCallback(
+        (idx: number) => {
+            setDirection(idx > active ? 1 : -1);
+            setActive(idx);
+        },
+        [active]
+    );
 
     const next = useCallback(() => {
         setDirection(1);
@@ -148,20 +156,31 @@ export default function PipelineSlides({ autoPlay = true, interval = 3500 }: Pip
                                 className="w-10 h-10 rounded-full flex items-center justify-center text-lg border-2 transition-all duration-500 font-bold"
                                 style={{
                                     borderColor: i <= active ? s.color : 'rgba(255,255,255,0.1)',
-                                    background: i === active ? `${s.color}25` : i < active ? `${s.color}15` : 'transparent',
+                                    background:
+                                        i === active
+                                            ? `${s.color}25`
+                                            : i < active
+                                              ? `${s.color}15`
+                                              : 'transparent',
                                     boxShadow: i === active ? `0 0 20px ${s.color}60` : 'none',
                                 }}
                             >
                                 {i < active ? '✓' : s.icon}
                             </div>
-                            <span className="text-[10px] font-mono hidden sm:block"
-                                style={{ color: i === active ? s.color : 'rgba(148,163,184,0.6)' }}>
+                            <span
+                                className="text-[10px] font-mono hidden sm:block"
+                                style={{ color: i === active ? s.color : 'rgba(148,163,184,0.6)' }}
+                            >
                                 {s.stage}
                             </span>
                         </button>
                         {i < SLIDES.length - 1 && (
-                            <div className="w-8 sm:w-16 h-[2px] mx-1 rounded-full transition-all duration-700"
-                                style={{ background: i < active ? slide.color : 'rgba(255,255,255,0.1)' }} />
+                            <div
+                                className="w-8 sm:w-16 h-[2px] mx-1 rounded-full transition-all duration-700"
+                                style={{
+                                    background: i < active ? slide.color : 'rgba(255,255,255,0.1)',
+                                }}
+                            />
                         )}
                     </div>
                 ))}
@@ -184,15 +203,23 @@ export default function PipelineSlides({ autoPlay = true, interval = 3500 }: Pip
                         {/* Left: Text */}
                         <div>
                             {/* Stage badge */}
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-xs font-mono font-semibold"
-                                style={{ background: `${slide.color}15`, color: slide.color, border: `1px solid ${slide.color}40` }}>
+                            <div
+                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-xs font-mono font-semibold"
+                                style={{
+                                    background: `${slide.color}15`,
+                                    color: slide.color,
+                                    border: `1px solid ${slide.color}40`,
+                                }}
+                            >
                                 <span>{slide.icon}</span> {slide.stage} · {slide.aws}
                             </div>
 
                             <h3 className="text-2xl md:text-3xl font-black font-poppins text-white mb-3 leading-tight">
                                 {slide.title}
                             </h3>
-                            <p className="text-slate-400 leading-relaxed mb-5">{slide.description}</p>
+                            <p className="text-slate-400 leading-relaxed mb-5">
+                                {slide.description}
+                            </p>
 
                             {/* Details */}
                             <ul className="space-y-2">
@@ -204,8 +231,15 @@ export default function PipelineSlides({ autoPlay = true, interval = 3500 }: Pip
                                         transition={{ delay: i * 0.08 }}
                                         className="flex items-center gap-2 text-sm text-slate-300"
                                     >
-                                        <span className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 text-xs"
-                                            style={{ background: `${slide.color}20`, color: slide.color }}>✓</span>
+                                        <span
+                                            className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 text-xs"
+                                            style={{
+                                                background: `${slide.color}20`,
+                                                color: slide.color,
+                                            }}
+                                        >
+                                            ✓
+                                        </span>
                                         {d}
                                     </motion.li>
                                 ))}
@@ -257,22 +291,30 @@ export default function PipelineSlides({ autoPlay = true, interval = 3500 }: Pip
 
             {/* Navigation arrows */}
             <div className="flex justify-center gap-4 mt-6">
-                <button onClick={() => goTo((active - 1 + SLIDES.length) % SLIDES.length)}
-                    className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-slate-400 hover:text-white transition-all hover:border-orange-500/40">
+                <button
+                    onClick={() => goTo((active - 1 + SLIDES.length) % SLIDES.length)}
+                    className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-slate-400 hover:text-white transition-all hover:border-orange-500/40"
+                >
                     ←
                 </button>
                 <div className="flex gap-2 items-center">
                     {SLIDES.map((_, i) => (
-                        <button key={i} onClick={() => goTo(i)}
+                        <button
+                            key={i}
+                            onClick={() => goTo(i)}
                             className="rounded-full transition-all duration-300"
                             style={{
-                                width: i === active ? 20 : 8, height: 8,
+                                width: i === active ? 20 : 8,
+                                height: 8,
                                 background: i === active ? slide.color : 'rgba(255,255,255,0.2)',
-                            }} />
+                            }}
+                        />
                     ))}
                 </div>
-                <button onClick={() => goTo((active + 1) % SLIDES.length)}
-                    className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-slate-400 hover:text-white transition-all hover:border-orange-500/40">
+                <button
+                    onClick={() => goTo((active + 1) % SLIDES.length)}
+                    className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-slate-400 hover:text-white transition-all hover:border-orange-500/40"
+                >
                     →
                 </button>
             </div>

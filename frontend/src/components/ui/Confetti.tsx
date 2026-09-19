@@ -66,7 +66,7 @@ export default function Confetti({ active, onComplete }: ConfettiProps) {
                 ctx.translate(p.x, p.y);
                 ctx.rotate((p.rotation * Math.PI) / 180);
                 ctx.fillStyle = p.color;
-                ctx.globalAlpha = Math.max(0, 1 - (p.y / canvas.height));
+                ctx.globalAlpha = Math.max(0, 1 - p.y / canvas.height);
 
                 if (p.shape === 'rect') {
                     ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
@@ -103,7 +103,8 @@ export default function Confetti({ active, onComplete }: ConfettiProps) {
         } else {
             cancelAnimationFrame(animRef.current);
             const ctx = canvasRef.current?.getContext('2d');
-            if (ctx && canvasRef.current) ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            if (ctx && canvasRef.current)
+                ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
         }
         return () => cancelAnimationFrame(animRef.current);
     }, [active, launch]);

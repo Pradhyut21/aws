@@ -84,8 +84,12 @@ class CircuitBreaker {
         }
     }
 
-    get isOpen() { return this.state === 'open'; }
-    getState() { return this.state; }
+    get isOpen() {
+        return this.state === 'open';
+    }
+    getState() {
+        return this.state;
+    }
 }
 
 // One breaker per model — Nova Pro and Nova Lite can fail independently
@@ -104,10 +108,17 @@ const bedrockClient = new BedrockRuntimeClient({
     region: process.env.AWS_REGION || 'us-east-1',
 });
 
-interface BedrockResult { text: string; inputTokens: number; outputTokens: number; }
+interface BedrockResult {
+    text: string;
+    inputTokens: number;
+    outputTokens: number;
+}
 
 async function invokeBedrock(
-    modelId: string, prompt: string, maxTokens: number, temperature: number
+    modelId: string,
+    prompt: string,
+    maxTokens: number,
+    temperature: number
 ): Promise<BedrockResult> {
     const payload = {
         schemaVersion: 'messages-v1',
@@ -124,7 +135,7 @@ async function invokeBedrock(
     const body = JSON.parse(new TextDecoder().decode(response.body));
     return {
         text: body.output.message.content[0].text as string,
-        inputTokens:  body.usage?.inputTokens  ?? 0,
+        inputTokens: body.usage?.inputTokens ?? 0,
         outputTokens: body.usage?.outputTokens ?? 0,
     };
 }
@@ -139,11 +150,11 @@ export class Agent {
     public traces: AgentTrace[] = [];
 
     constructor(options: AgentOptions = {}) {
-        this.modelId    = options.modelId    ?? 'us.amazon.nova-pro-v1:0';
-        this.maxTokens  = options.maxTokens  ?? 2000;
+        this.modelId = options.modelId ?? 'us.amazon.nova-pro-v1:0';
+        this.maxTokens = options.maxTokens ?? 2000;
         this.temperature = options.temperature ?? 0.7;
         this.onToolStart = options.onToolStart;
-        this.onToolEnd   = options.onToolEnd;
+        this.onToolEnd = options.onToolEnd;
     }
 
     registerTool<TInput, TOutput>(tool: ToolDefinition<TInput, TOutput>): this {
@@ -161,7 +172,12 @@ export class Agent {
     async invoke(task: string): Promise<any> {
         if (this.tools.size === 0) {
             // Pure LLM agent — no tools
-            const result = await invokeBedrock(this.modelId, task, this.maxTokens, this.temperature);
+            const result = await invokeBedrock(
+                this.modelId,
+                task,
+                this.maxTokens,
+                this.temperature
+            );
             return result.text;
         }
 
@@ -187,7 +203,7 @@ ${toolDescs}
 Return ONLY a JSON array of tool calls in order:
 [{"tool": "<name>", "input": <object>}, ...]`,
             1000,
-            0.3,
+            0.3
         );
 
         let calls: Array<{ tool: string; input: any }> = [];
@@ -222,7 +238,7 @@ Return ONLY a JSON array of tool calls in order:
             output = await tool.handler(input);
             // If the handler itself returns token info (from a nested Bedrock call),
             // bubble it up if it's stored on the output
-            inputTokens  = output?.__inputTokens  ?? 0;
+            inputTokens = output?.__inputTokens ?? 0;
             outputTokens = output?.__outputTokens ?? 0;
         } catch (err: any) {
             status = 'error';
@@ -231,8 +247,14 @@ Return ONLY a JSON array of tool calls in order:
         } finally {
             const latencyMs = Date.now() - start;
             this.traces.push({
-                toolName: tool.name, input, output, latencyMs, status, error: errorMsg,
-                inputTokens, outputTokens,
+                toolName: tool.name,
+                input,
+                output,
+                latencyMs,
+                status,
+                error: errorMsg,
+                inputTokens,
+                outputTokens,
             });
             this.onToolEnd?.(tool.name, output, latencyMs);
         }
@@ -241,6 +263,8 @@ Return ONLY a JSON array of tool calls in order:
 }
 
 /** Convenience builder — mirrors the @strands-agents/sdk tool() function */
-export function tool<TInput, TOutput>(def: ToolDefinition<TInput, TOutput>): ToolDefinition<TInput, TOutput> {
+export function tool<TInput, TOutput>(
+    def: ToolDefinition<TInput, TOutput>
+): ToolDefinition<TInput, TOutput> {
     return def;
 }

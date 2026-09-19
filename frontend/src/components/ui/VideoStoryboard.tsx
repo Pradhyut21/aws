@@ -11,11 +11,41 @@ interface Frame {
 }
 
 const DEFAULT_FRAMES: Frame[] = [
-    { time: '0:00', emoji: '🌅', visual: 'Opening shot: Product close-up with warm festival lighting', narration: 'नमस्ते! Diwali special offer from Raju Silk House, Varanasi!', transition: 'Fade in' },
-    { time: '0:03', emoji: '🛍️', visual: 'Showcase 3 premium silk sarees with price tags', narration: 'Genuine Banarasi silk — starting from just ₹2,499', transition: 'Slide left' },
-    { time: '0:07', emoji: '✨', visual: 'Satisfied customer trying on saree, smiling', narration: 'Over 500 happy customers this season!', transition: 'Zoom in' },
-    { time: '0:11', emoji: '🎁', visual: 'Gift box with saree and discount sticker — 30% OFF', narration: 'Special 30% Diwali discount — only 3 days left!', transition: 'Flash' },
-    { time: '0:14', emoji: '📱', visual: 'WhatsApp number + shop address on screen', narration: 'WhatsApp us at 9876543210. Happy Diwali! 🎆', transition: 'Fade out' },
+    {
+        time: '0:00',
+        emoji: '🌅',
+        visual: 'Opening shot: Product close-up with warm festival lighting',
+        narration: 'नमस्ते! Diwali special offer from Raju Silk House, Varanasi!',
+        transition: 'Fade in',
+    },
+    {
+        time: '0:03',
+        emoji: '🛍️',
+        visual: 'Showcase 3 premium silk sarees with price tags',
+        narration: 'Genuine Banarasi silk — starting from just ₹2,499',
+        transition: 'Slide left',
+    },
+    {
+        time: '0:07',
+        emoji: '✨',
+        visual: 'Satisfied customer trying on saree, smiling',
+        narration: 'Over 500 happy customers this season!',
+        transition: 'Zoom in',
+    },
+    {
+        time: '0:11',
+        emoji: '🎁',
+        visual: 'Gift box with saree and discount sticker — 30% OFF',
+        narration: 'Special 30% Diwali discount — only 3 days left!',
+        transition: 'Flash',
+    },
+    {
+        time: '0:14',
+        emoji: '📱',
+        visual: 'WhatsApp number + shop address on screen',
+        narration: 'WhatsApp us at 9876543210. Happy Diwali! 🎆',
+        transition: 'Fade out',
+    },
 ];
 
 interface VideoStoryboardProps {
@@ -24,7 +54,11 @@ interface VideoStoryboardProps {
     poster?: string;
 }
 
-export default function VideoStoryboard({ frames = DEFAULT_FRAMES, title = '15-Second Nova Reel Script', poster = '' }: VideoStoryboardProps) {
+export default function VideoStoryboard({
+    frames = DEFAULT_FRAMES,
+    title = '15-Second Nova Reel Script',
+    poster = '',
+}: VideoStoryboardProps) {
     const [currentFrame, setCurrentFrame] = useState(0);
     const [playing, setPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -64,7 +98,9 @@ export default function VideoStoryboard({ frames = DEFAULT_FRAMES, title = '15-S
                 clearInterval(intervalRef.current!);
             }
         }, 50);
-        return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+        };
     }, [playing, frames.length]);
 
     const handleRenderVideo = () => {
@@ -106,8 +142,19 @@ export default function VideoStoryboard({ frames = DEFAULT_FRAMES, title = '15-S
                 <button
                     onClick={playing ? pause : play}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-                    style={playing ? { background: 'rgba(255,68,68,0.15)', color: '#FF6666', border: '1px solid rgba(255,68,68,0.3)' }
-                        : { background: 'rgba(0,255,136,0.15)', color: '#00FF88', border: '1px solid rgba(0,255,136,0.3)' }}
+                    style={
+                        playing
+                            ? {
+                                  background: 'rgba(255,68,68,0.15)',
+                                  color: '#FF6666',
+                                  border: '1px solid rgba(255,68,68,0.3)',
+                              }
+                            : {
+                                  background: 'rgba(0,255,136,0.15)',
+                                  color: '#00FF88',
+                                  border: '1px solid rgba(0,255,136,0.3)',
+                              }
+                    }
                     disabled={viewMode === 'video'}
                 >
                     {playing ? '⏸ Pause Script' : '▶ Preview Script'}
@@ -121,7 +168,7 @@ export default function VideoStoryboard({ frames = DEFAULT_FRAMES, title = '15-S
                         <motion.div
                             className="h-full rounded-full"
                             style={{
-                                width: `${((currentFrame * FRAME_DURATION) + (progress / 100) * FRAME_DURATION) / (frames.length * FRAME_DURATION) * 100}%`,
+                                width: `${((currentFrame * FRAME_DURATION + (progress / 100) * FRAME_DURATION) / (frames.length * FRAME_DURATION)) * 100}%`,
                                 background: 'linear-gradient(90deg, #FF6B35, #F7C948)',
                             }}
                             transition={{ duration: 0.05 }}
@@ -133,16 +180,28 @@ export default function VideoStoryboard({ frames = DEFAULT_FRAMES, title = '15-S
                         {frames.map((f, i) => (
                             <button
                                 key={i}
-                                onClick={() => { setCurrentFrame(i); setPlaying(false); }}
+                                onClick={() => {
+                                    setCurrentFrame(i);
+                                    setPlaying(false);
+                                }}
                                 className="flex-shrink-0 w-24 h-16 rounded-xl flex flex-col items-center justify-center gap-1 border transition-all text-center"
                                 style={{
-                                    background: i === currentFrame ? 'rgba(255,107,53,0.15)' : 'rgba(255,255,255,0.04)',
-                                    borderColor: i === currentFrame ? '#FF6B3580' : 'rgba(255,255,255,0.08)',
-                                    boxShadow: i === currentFrame ? '0 0 20px rgba(255,107,53,0.2)' : 'none',
+                                    background:
+                                        i === currentFrame
+                                            ? 'rgba(255,107,53,0.15)'
+                                            : 'rgba(255,255,255,0.04)',
+                                    borderColor:
+                                        i === currentFrame ? '#FF6B3580' : 'rgba(255,255,255,0.08)',
+                                    boxShadow:
+                                        i === currentFrame
+                                            ? '0 0 20px rgba(255,107,53,0.2)'
+                                            : 'none',
                                 }}
                             >
                                 <span className="text-xl">{f.emoji}</span>
-                                <span className="text-[10px] font-mono text-slate-400">{f.time}</span>
+                                <span className="text-[10px] font-mono text-slate-400">
+                                    {f.time}
+                                </span>
                             </button>
                         ))}
                     </div>
@@ -158,19 +217,35 @@ export default function VideoStoryboard({ frames = DEFAULT_FRAMES, title = '15-S
                             className="grid grid-cols-1 md:grid-cols-2 gap-4"
                         >
                             {/* Visual description */}
-                            <div className="rounded-xl p-4" style={{ background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.15)' }}>
+                            <div
+                                className="rounded-xl p-4"
+                                style={{
+                                    background: 'rgba(0,212,255,0.06)',
+                                    border: '1px solid rgba(0,212,255,0.15)',
+                                }}
+                            >
                                 <div className="text-xs text-cyan-400 font-mono mb-2 flex items-center gap-1">
                                     <span>🎥</span> VISUAL · {frame.time} · {frame.transition}
                                 </div>
-                                <p className="text-slate-200 text-sm leading-relaxed">{frame.visual}</p>
+                                <p className="text-slate-200 text-sm leading-relaxed">
+                                    {frame.visual}
+                                </p>
                             </div>
 
                             {/* Narration */}
-                            <div className="rounded-xl p-4" style={{ background: 'rgba(255,107,53,0.06)', border: '1px solid rgba(255,107,53,0.15)' }}>
+                            <div
+                                className="rounded-xl p-4"
+                                style={{
+                                    background: 'rgba(255,107,53,0.06)',
+                                    border: '1px solid rgba(255,107,53,0.15)',
+                                }}
+                            >
                                 <div className="text-xs text-orange-400 font-mono mb-2 flex items-center gap-1">
                                     <span>🎙️</span> NARRATION · Nova Sonic TTS
                                 </div>
-                                <p className="text-slate-200 text-sm leading-relaxed italic">"{frame.narration}"</p>
+                                <p className="text-slate-200 text-sm leading-relaxed italic">
+                                    "{frame.narration}"
+                                </p>
                             </div>
                         </motion.div>
                     </AnimatePresence>
@@ -192,7 +267,11 @@ export default function VideoStoryboard({ frames = DEFAULT_FRAMES, title = '15-S
                                 alt="Video background"
                                 className="w-full h-full object-cover opacity-60 mix-blend-overlay"
                                 animate={{ scale: [1, 1.15, 1] }}
-                                transition={{ duration: frames.length * 3, ease: "linear", repeat: Infinity }}
+                                transition={{
+                                    duration: frames.length * 3,
+                                    ease: 'linear',
+                                    repeat: Infinity,
+                                }}
                             />
                         ) : (
                             <div className="w-full h-full bg-gradient-to-br from-slate-800 to-black" />
@@ -209,7 +288,9 @@ export default function VideoStoryboard({ frames = DEFAULT_FRAMES, title = '15-S
                                     transition={{ duration: 0.5 }}
                                     className="max-w-xl"
                                 >
-                                    <div className="text-6xl mb-6 shadow-black drop-shadow-2xl">{frame.emoji}</div>
+                                    <div className="text-6xl mb-6 shadow-black drop-shadow-2xl">
+                                        {frame.emoji}
+                                    </div>
                                     <h2 className="text-3xl md:text-4xl font-black text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] font-poppins capitalize leading-tight">
                                         {frame.narration}
                                     </h2>
@@ -223,8 +304,15 @@ export default function VideoStoryboard({ frames = DEFAULT_FRAMES, title = '15-S
                                 <motion.div
                                     key={i}
                                     className="w-1.5 bg-cyan-400 rounded-full"
-                                    animate={{ height: playing ? [10, Math.random() * 40 + 10, 10] : 10 }}
-                                    transition={{ duration: 0.3, repeat: Infinity, repeatType: 'reverse', delay: i * 0.05 }}
+                                    animate={{
+                                        height: playing ? [10, Math.random() * 40 + 10, 10] : 10,
+                                    }}
+                                    transition={{
+                                        duration: 0.3,
+                                        repeat: Infinity,
+                                        repeatType: 'reverse',
+                                        delay: i * 0.05,
+                                    }}
                                 />
                             ))}
                         </div>
@@ -234,13 +322,16 @@ export default function VideoStoryboard({ frames = DEFAULT_FRAMES, title = '15-S
                     <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/20">
                         <motion.div
                             className="h-full bg-cyan-500"
-                            style={{ width: `${((currentFrame * FRAME_DURATION) + (progress / 100) * FRAME_DURATION) / (frames.length * FRAME_DURATION) * 100}%` }}
+                            style={{
+                                width: `${((currentFrame * FRAME_DURATION + (progress / 100) * FRAME_DURATION) / (frames.length * FRAME_DURATION)) * 100}%`,
+                            }}
                         />
                     </div>
 
                     <div className="absolute top-4 left-4 flex gap-2">
                         <span className="bg-black/60 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-full font-semibold border border-white/10 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" /> Nova Reel Engine
+                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" /> Nova
+                            Reel Engine
                         </span>
                     </div>
 
@@ -296,8 +387,12 @@ export default function VideoStoryboard({ frames = DEFAULT_FRAMES, title = '15-S
                             <Loader2 size={18} className="text-orange-400 animate-spin" />
                             <div className="flex-1">
                                 <div className="flex justify-between text-xs mb-1">
-                                    <span className="text-slate-300 font-medium">Rendering Nova Reel...</span>
-                                    <span className="text-orange-400 font-mono">{Math.round(renderProgress)}%</span>
+                                    <span className="text-slate-300 font-medium">
+                                        Rendering Nova Reel...
+                                    </span>
+                                    <span className="text-orange-400 font-mono">
+                                        {Math.round(renderProgress)}%
+                                    </span>
                                 </div>
                                 <div className="h-1.5 bg-black/50 rounded-full overflow-hidden">
                                     <motion.div

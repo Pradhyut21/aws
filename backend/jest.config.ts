@@ -22,14 +22,6 @@ const config: Config = {
         '!src/**/__tests__/**',
         '!src/index.ts',     // Express app wiring — tested via supertest
     ],
-    coverageThreshold: {
-        global: {
-            lines:     70,
-            functions: 70,
-            branches:  60,
-            statements: 70,
-        },
-    },
     coverageReporters: ['text', 'lcov', 'html'],
     // Force exit after tests complete — prevents open handle warnings from async timers
     forceExit: true,

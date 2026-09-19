@@ -8,7 +8,13 @@ interface CounterStatProps {
     icon?: string;
 }
 
-export default function CounterStat({ value, suffix = '', prefix = '', label, icon }: CounterStatProps) {
+export default function CounterStat({
+    value,
+    suffix = '',
+    prefix = '',
+    label,
+    icon,
+}: CounterStatProps) {
     const { count, ref } = useScrollCounter(value);
 
     const formatCount = (n: number) => {
@@ -21,7 +27,9 @@ export default function CounterStat({ value, suffix = '', prefix = '', label, ic
         <div ref={ref} className="flex flex-col items-center gap-1 text-center">
             {icon && <span className="text-3xl">{icon}</span>}
             <div className="text-4xl md:text-5xl font-black font-poppins gradient-text">
-                {prefix}{formatCount(count)}{suffix}
+                {prefix}
+                {formatCount(count)}
+                {suffix}
             </div>
             <div className="text-slate-400 text-sm font-medium">{label}</div>
         </div>

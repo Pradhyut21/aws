@@ -40,15 +40,22 @@ export const TRANSCRIBE_LANG_MAP: Record<string, LanguageCode> = {
     kn: LanguageCode.KN_IN,
     ml: LanguageCode.ML_IN,
     mr: LanguageCode.MR_IN,
-    bn: LanguageCode.EN_IN,  // Bengali not in Transcribe Streaming — fall back to en-IN
-    gu: LanguageCode.EN_IN,  // Gujarati not in Transcribe Streaming — fall back to en-IN
-    pa: LanguageCode.EN_IN,  // Punjabi not in Transcribe Streaming — fall back to en-IN
+    bn: LanguageCode.EN_IN, // Bengali not in Transcribe Streaming — fall back to en-IN
+    gu: LanguageCode.EN_IN, // Gujarati not in Transcribe Streaming — fall back to en-IN
+    pa: LanguageCode.EN_IN, // Punjabi not in Transcribe Streaming — fall back to en-IN
 };
 
 export const LANG_DISPLAY_NAMES: Record<string, string> = {
-    hi: 'Hindi', en: 'English (Indian)', ta: 'Tamil', te: 'Telugu',
-    kn: 'Kannada', ml: 'Malayalam', mr: 'Marathi', bn: 'Bengali',
-    gu: 'Gujarati', pa: 'Punjabi',
+    hi: 'Hindi',
+    en: 'English (Indian)',
+    ta: 'Tamil',
+    te: 'Telugu',
+    kn: 'Kannada',
+    ml: 'Malayalam',
+    mr: 'Marathi',
+    bn: 'Bengali',
+    gu: 'Gujarati',
+    pa: 'Punjabi',
 };
 
 // ─── Transcribe client ──────────────────────────────────────────────────────
@@ -67,30 +74,45 @@ function convertToPcm(inputBuffer: Buffer): Buffer {
     const ffmpegBin: string = require('ffmpeg-static');
 
     const tmpDir = os.tmpdir();
-    const inputFile  = path.join(tmpDir, `bm-transcribe-in-${Date.now()}.webm`);
+    const inputFile = path.join(tmpDir, `bm-transcribe-in-${Date.now()}.webm`);
     const outputFile = path.join(tmpDir, `bm-transcribe-out-${Date.now()}.pcm`);
 
     try {
         fs.writeFileSync(inputFile, inputBuffer);
 
         // Convert: any input → PCM 16-bit LE, 16kHz, 1 channel (mono)
-        execFileSync(ffmpegBin, [
-            '-y',                    // overwrite output
-            '-i', inputFile,         // input file
-            '-ar', '16000',          // sample rate: 16kHz (required by Transcribe)
-            '-ac', '1',              // channels: mono
-            '-f', 's16le',           // format: signed 16-bit little-endian PCM
-            outputFile,
-        ], {
-            timeout: 20_000,
-            stdio: 'pipe',           // suppress ffmpeg console output
-        });
+        execFileSync(
+            ffmpegBin,
+            [
+                '-y', // overwrite output
+                '-i',
+                inputFile, // input file
+                '-ar',
+                '16000', // sample rate: 16kHz (required by Transcribe)
+                '-ac',
+                '1', // channels: mono
+                '-f',
+                's16le', // format: signed 16-bit little-endian PCM
+                outputFile,
+            ],
+            {
+                timeout: 20_000,
+                stdio: 'pipe', // suppress ffmpeg console output
+            }
+        );
 
         return fs.readFileSync(outputFile);
-
     } finally {
-        try { fs.unlinkSync(inputFile);  } catch { /* ignore */ }
-        try { fs.unlinkSync(outputFile); } catch { /* ignore */ }
+        try {
+            fs.unlinkSync(inputFile);
+        } catch {
+            /* ignore */
+        }
+        try {
+            fs.unlinkSync(outputFile);
+        } catch {
+            /* ignore */
+        }
     }
 }
 
@@ -124,7 +146,9 @@ export async function transcribeAudioBuffer(
     // ── Step 1: Convert browser audio to PCM ──────────────────────────────
     console.log(`🎙️ [Transcribe] Converting ${audioBuffer.length} bytes → PCM 16kHz mono…`);
     const pcmBuffer = convertToPcm(audioBuffer);
-    console.log(`🎙️ [Transcribe] PCM ready: ${pcmBuffer.length} bytes → streaming to Transcribe (${transcribeLang})…`);
+    console.log(
+        `🎙️ [Transcribe] PCM ready: ${pcmBuffer.length} bytes → streaming to Transcribe (${transcribeLang})…`
+    );
 
     // ── Step 2: Stream PCM to Amazon Transcribe ───────────────────────────
     // Transcribe Streaming expects an AsyncIterable of AudioEvent chunks.
@@ -147,10 +171,10 @@ export async function transcribeAudioBuffer(
     }
 
     const command = new StartStreamTranscriptionCommand({
-        LanguageCode:         transcribeLang,
-        MediaEncoding:        'pcm',
+        LanguageCode: transcribeLang,
+        MediaEncoding: 'pcm',
         MediaSampleRateHertz: 16_000,
-        AudioStream:          audioStream(),
+        AudioStream: audioStream(),
     });
 
     const response = await transcribeClient.send(command);
@@ -163,7 +187,7 @@ export async function transcribeAudioBuffer(
     for await (const event of response.TranscriptResultStream!) {
         if (!event.TranscriptEvent?.Transcript?.Results) continue;
         for (const result of event.TranscriptEvent.Transcript.Results) {
-            if (result.IsPartial) continue;  // skip partial results
+            if (result.IsPartial) continue; // skip partial results
             const alt = result.Alternatives?.[0];
             if (!alt?.Transcript) continue;
 
@@ -171,7 +195,7 @@ export async function transcribeAudioBuffer(
             transcript += (transcript ? ' ' : '') + alt.Transcript.trim();
 
             // Accumulate per-word confidence scores
-            for (const item of (alt.Items ?? [])) {
+            for (const item of alt.Items ?? []) {
                 if (item.Confidence !== undefined) {
                     totalConfidence += item.Confidence;
                     wordCount++;
@@ -183,7 +207,9 @@ export async function transcribeAudioBuffer(
     const avgConfidence = wordCount > 0 ? totalConfidence / wordCount : 0.95;
     const durationMs = Date.now() - startMs;
 
-    console.log(`✅ [Transcribe] Done in ${durationMs}ms — "${transcript.slice(0, 60)}…" (confidence: ${(avgConfidence * 100).toFixed(1)}%)`);
+    console.log(
+        `✅ [Transcribe] Done in ${durationMs}ms — "${transcript.slice(0, 60)}…" (confidence: ${(avgConfidence * 100).toFixed(1)}%)`
+    );
 
     return {
         transcription: transcript || '',

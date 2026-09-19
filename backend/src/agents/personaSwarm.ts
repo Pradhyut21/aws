@@ -22,8 +22,11 @@
 
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import {
-    getPersonas, savePersonaReview,
-    BharatResonanceScore, PersonaReviewResult, IndianPersona,
+    getPersonas,
+    savePersonaReview,
+    BharatResonanceScore,
+    PersonaReviewResult,
+    IndianPersona,
 } from '../services/personaStore';
 
 const bedrockClient = new BedrockRuntimeClient({
@@ -31,7 +34,7 @@ const bedrockClient = new BedrockRuntimeClient({
 });
 
 const NOVA_LITE = 'us.amazon.nova-lite-v1:0';
-const NOVA_PRO  = 'us.amazon.nova-pro-v1:0';
+const NOVA_PRO = 'us.amazon.nova-pro-v1:0';
 
 // ─── CORE BEDROCK HELPER ──────────────────────────────────────────────────────
 
@@ -47,7 +50,7 @@ async function callBedrock(modelId: string, prompt: string, maxTokens = 400): Pr
                 inferenceConfig: { maxTokens, temperature: 0.7 },
             }),
         });
-        const res  = await bedrockClient.send(cmd);
+        const res = await bedrockClient.send(cmd);
         const body = JSON.parse(new TextDecoder().decode(res.body));
         return body.output.message.content[0].text as string;
     } catch (err: any) {
@@ -59,7 +62,7 @@ async function callBedrock(modelId: string, prompt: string, maxTokens = 400): Pr
 
 async function reviewAsPersona(
     persona: IndianPersona,
-    campaignContent: string,
+    campaignContent: string
 ): Promise<PersonaReviewResult> {
     const prompt = `${persona.systemPrompt}
 
@@ -87,26 +90,31 @@ Scoring guide:
         const raw = await callBedrock(NOVA_LITE, prompt, 250);
         // Extract JSON from the response
         let jsonStr = raw.trim();
-        if (jsonStr.includes('```json')) jsonStr = jsonStr.split('```json')[1].split('```')[0].trim();
+        if (jsonStr.includes('```json'))
+            jsonStr = jsonStr.split('```json')[1].split('```')[0].trim();
         else if (jsonStr.includes('```')) jsonStr = jsonStr.split('```')[1].split('```')[0].trim();
 
         const parsed = JSON.parse(jsonStr);
         return {
-            personaId:      persona.personaId,
-            name:           persona.name,
+            personaId: persona.personaId,
+            name: persona.name,
             resonanceScore: Math.min(100, Math.max(0, Number(parsed.resonanceScore) || 50)),
-            verdict:        (['PASS', 'FLAG', 'HIGH_RISK'].includes(parsed.verdict)) ? parsed.verdict : 'FLAG',
-            feedback:       String(parsed.feedback || 'No feedback provided').slice(0, 300),
-            suggestedTweak: parsed.suggestedTweak ? String(parsed.suggestedTweak).slice(0, 200) : undefined,
+            verdict: ['PASS', 'FLAG', 'HIGH_RISK'].includes(parsed.verdict)
+                ? parsed.verdict
+                : 'FLAG',
+            feedback: String(parsed.feedback || 'No feedback provided').slice(0, 300),
+            suggestedTweak: parsed.suggestedTweak
+                ? String(parsed.suggestedTweak).slice(0, 200)
+                : undefined,
         };
     } catch {
         // Graceful fallback if parsing fails
         return {
-            personaId:     persona.personaId,
-            name:          persona.name,
+            personaId: persona.personaId,
+            name: persona.name,
             resonanceScore: 60,
-            verdict:       'FLAG',
-            feedback:      'Review could not be parsed. Treated as FLAG.',
+            verdict: 'FLAG',
+            feedback: 'Review could not be parsed. Treated as FLAG.',
         };
     }
 }
@@ -115,7 +123,7 @@ Scoring guide:
 
 async function runValidatorAgent(
     personaResults: PersonaReviewResult[],
-    campaignContent: string,
+    campaignContent: string
 ): Promise<string[]> {
     const lowScores = personaResults.filter(r => r.resonanceScore < 50);
     const highRisks = personaResults.filter(r => r.verdict === 'HIGH_RISK');
@@ -130,7 +138,10 @@ ${campaignContent.slice(0, 800)}
 Persona review summary:
 - ${personaResults.length} personas reviewed
 - ${personaResults.filter(r => r.verdict === 'PASS').length} PASS, ${personaResults.filter(r => r.verdict === 'FLAG').length} FLAG, ${highRisks.length} HIGH_RISK
-- Lowest scoring personas: ${lowScores.slice(0, 3).map(r => `${r.name} (${r.resonanceScore}/100): "${r.feedback}"`).join(' | ')}
+- Lowest scoring personas: ${lowScores
+        .slice(0, 3)
+        .map(r => `${r.name} (${r.resonanceScore}/100): "${r.feedback}"`)
+        .join(' | ')}
 ${highRisks.length > 0 ? `- HIGH RISK flags: ${highRisks.map(r => r.feedback).join(' | ')}` : ''}
 
 Identify any LEGAL, CULTURAL or BRAND SAFETY violations in this Indian campaign.
@@ -144,7 +155,8 @@ Maximum 5 flags. Be specific and actionable.`;
     try {
         const raw = await callBedrock(NOVA_PRO, prompt, 300);
         let jsonStr = raw.trim();
-        if (jsonStr.includes('```json')) jsonStr = jsonStr.split('```json')[1].split('```')[0].trim();
+        if (jsonStr.includes('```json'))
+            jsonStr = jsonStr.split('```json')[1].split('```')[0].trim();
         else if (jsonStr.includes('```')) jsonStr = jsonStr.split('```')[1].split('```')[0].trim();
         const parsed = JSON.parse(jsonStr);
         return Array.isArray(parsed) ? parsed.slice(0, 5).map(String) : [];
@@ -158,13 +170,17 @@ Maximum 5 flags. Be specific and actionable.`;
 async function runFinalizerAgent(
     personaResults: PersonaReviewResult[],
     validatorFlags: string[],
-    campaignContent: string,
+    campaignContent: string
 ): Promise<string> {
     const avgScore = Math.round(
         personaResults.reduce((s, r) => s + r.resonanceScore, 0) / personaResults.length
     );
-    const topPersonas  = [...personaResults].sort((a, b) => b.resonanceScore - a.resonanceScore).slice(0, 3);
-    const lowPersonas  = [...personaResults].sort((a, b) => a.resonanceScore - b.resonanceScore).slice(0, 3);
+    const topPersonas = [...personaResults]
+        .sort((a, b) => b.resonanceScore - a.resonanceScore)
+        .slice(0, 3);
+    const lowPersonas = [...personaResults]
+        .sort((a, b) => a.resonanceScore - b.resonanceScore)
+        .slice(0, 3);
 
     const prompt = `You are the BharatMedia campaign strategy finalizer.
 
@@ -197,8 +213,8 @@ Be specific — name the states/languages/demographics. Respond in 3 sentences m
 // ─── MAIN ORCHESTRATOR ────────────────────────────────────────────────────────
 
 export interface PersonaSwarmInput {
-    campaignId:      string;
-    campaignContent: string;   // the campaign text to review
+    campaignId: string;
+    campaignContent: string; // the campaign text to review
     targetPersonaIds?: string[]; // optional: run only specific personas (default: all 20)
 }
 
@@ -240,8 +256,8 @@ export async function runPersonaSwarm(input: PersonaSwarmInput): Promise<BharatR
     const overallResonance = Math.round(
         personaResults.reduce((s, r) => s + r.resonanceScore, 0) / personaResults.length
     );
-    const passCount     = personaResults.filter(r => r.verdict === 'PASS').length;
-    const flagCount     = personaResults.filter(r => r.verdict === 'FLAG').length;
+    const passCount = personaResults.filter(r => r.verdict === 'PASS').length;
+    const flagCount = personaResults.filter(r => r.verdict === 'FLAG').length;
     const highRiskCount = personaResults.filter(r => r.verdict === 'HIGH_RISK').length;
 
     const result: BharatResonanceScore = {

@@ -9,7 +9,10 @@ import type { Campaign } from '../services/store';
 import { invokeNovaSonic } from '../services/bedrock';
 import { logger } from '../lib/logger';
 
-export async function runDistributionAgent(campaign: Campaign, creative: object): Promise<{
+export async function runDistributionAgent(
+    campaign: Campaign,
+    creative: object
+): Promise<{
     publishTimes: Record<string, string>;
     suggestedInfluencers: string[];
     estimatedReach: number;
@@ -49,9 +52,9 @@ Return ONLY valid JSON (no markdown):
         }
 
         return {
-            publishTimes:         parsed.publishTimes         || {},
+            publishTimes: parsed.publishTimes || {},
             suggestedInfluencers: parsed.suggestedInfluencers || [],
-            estimatedReach:       parsed.estimatedReach,
+            estimatedReach: parsed.estimatedReach,
         };
     } catch (error: unknown) {
         logger.error('Distribution agent error — using fallback', {
@@ -60,19 +63,24 @@ Return ONLY valid JSON (no markdown):
         });
         // Fallback: model-informed defaults (not random numbers)
         const regionSizes: Record<string, number> = {
-            'Mumbai': 85000, 'Delhi': 90000, 'Bengaluru': 70000,
-            'Hyderabad': 60000, 'Chennai': 55000, 'Kolkata': 50000,
-            'Varanasi': 22000, 'Jaipur': 35000,
+            Mumbai: 85000,
+            Delhi: 90000,
+            Bengaluru: 70000,
+            Hyderabad: 60000,
+            Chennai: 55000,
+            Kolkata: 50000,
+            Varanasi: 22000,
+            Jaipur: 35000,
         };
         const baseReach = regionSizes[campaign.region[0]] ?? 20000;
 
         return {
             publishTimes: {
                 instagram: '7:00 PM IST',
-                facebook:  '12:00 PM IST',
-                whatsapp:  '9:00 AM IST',
-                youtube:   '6:00 PM IST',
-                twitter:   '11:00 AM IST',
+                facebook: '12:00 PM IST',
+                whatsapp: '9:00 AM IST',
+                youtube: '6:00 PM IST',
+                twitter: '11:00 AM IST',
             },
             suggestedInfluencers: [
                 `@${campaign.region[0]?.toLowerCase().replace(/ /g, '_') ?? 'india'}_lifestyle`,

@@ -31,9 +31,9 @@
  */
 
 import { getCampaign, updateCampaign, Campaign } from '../services/store';
-import { runResearchAgent }    from './researchAgent';
-import { runCreativeSwarm }    from './creativeSwarm';
-import { runQualityGuard }     from './qualityGuard';
+import { runResearchAgent } from './researchAgent';
+import { runCreativeSwarm } from './creativeSwarm';
+import { runQualityGuard } from './qualityGuard';
 import { runDistributionAgent } from './distributionAgent';
 import {
     saveTraceStep,
@@ -60,26 +60,50 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Pro
 }
 
 // ─── Trace helper ────────────────────────────────────────────────────────────
-async function trace(campaignId: string, toolName: string, input: any, output: any, latencyMs: number, status: 'success' | 'error' = 'success') {
+async function trace(
+    campaignId: string,
+    toolName: string,
+    input: any,
+    output: any,
+    latencyMs: number,
+    status: 'success' | 'error' = 'success'
+) {
     try {
-        await saveTraceStep({ campaignId, toolName, input: typeof input === 'object' ? JSON.stringify(input).slice(0, 500) : String(input), output: typeof output === 'object' ? JSON.stringify(output).slice(0, 500) : String(output), latencyMs, status, timestamp: new Date().toISOString() });
-    } catch { /* non-critical */ }
+        await saveTraceStep({
+            campaignId,
+            toolName,
+            input: typeof input === 'object' ? JSON.stringify(input).slice(0, 500) : String(input),
+            output:
+                typeof output === 'object' ? JSON.stringify(output).slice(0, 500) : String(output),
+            latencyMs,
+            status,
+            timestamp: new Date().toISOString(),
+        });
+    } catch {
+        /* non-critical */
+    }
 }
 
 // ─── A/B Experiment builder ──────────────────────────────────────────────────
-async function buildExperimentVariants(campaign: Campaign, creative: any): Promise<ExperimentVariant[]> {
+async function buildExperimentVariants(
+    campaign: Campaign,
+    creative: any
+): Promise<ExperimentVariant[]> {
     const variants: ExperimentVariant[] = [
         {
-            id:       'variant-a',
-            label:    `Variant A — ${campaign.language.toUpperCase()} (Primary Language)`,
+            id: 'variant-a',
+            label: `Variant A — ${campaign.language.toUpperCase()} (Primary Language)`,
             language: campaign.language,
-            content:  { captions: creative.captions, images: creative.images },
+            content: { captions: creative.captions, images: creative.images },
         },
         {
-            id:       'variant-b',
-            label:    'Variant B — English',
+            id: 'variant-b',
+            label: 'Variant B — English',
             language: 'en',
-            content:  { captions: { instagram: creative.captions?.instagram || '' }, images: creative.images },
+            content: {
+                captions: { instagram: creative.captions?.instagram || '' },
+                images: creative.images,
+            },
         },
     ];
 
@@ -90,10 +114,10 @@ Business: ${campaign.businessType}. Goal: ${campaign.input.slice(0, 100)}
 Return ONLY the caption text (no JSON, no quotes).`;
         const bilingual = await invokeNovaOmni(bilingualPrompt, 200);
         variants.push({
-            id:       'variant-c',
-            label:    `Variant C — Bilingual (${campaign.language.toUpperCase()} + English)`,
+            id: 'variant-c',
+            label: `Variant C — Bilingual (${campaign.language.toUpperCase()} + English)`,
             language: `${campaign.language}+en`,
-            content:  { captions: { instagram: bilingual.trim() }, images: creative.images },
+            content: { captions: { instagram: bilingual.trim() }, images: creative.images },
         });
     } catch (err: unknown) {
         logger.warn('Bilingual variant generation failed — skipping', {
@@ -105,7 +129,11 @@ Return ONLY the caption text (no JSON, no quotes).`;
 }
 
 // ─── Learning Loop ────────────────────────────────────────────────────────────
-async function extractAndSaveLesson(campaign: Campaign, quality: any, distribution: any): Promise<void> {
+async function extractAndSaveLesson(
+    campaign: Campaign,
+    quality: any,
+    distribution: any
+): Promise<void> {
     try {
         const score = quality?.bharatScore?.total ?? 82;
         const reach = distribution?.estimatedReach ?? 0;
@@ -121,12 +149,12 @@ async function extractAndSaveLesson(campaign: Campaign, quality: any, distributi
 
         await saveLessonLearned(campaign.userId, {
             businessType: campaign.businessType,
-            region:       campaign.region,
-            language:     campaign.language,
-            strategy:     `${campaign.language} content for ${campaign.businessType} — goal: ${campaign.input.slice(0, 80)}`,
-            result:       `BharatScore: ${score}/100. Estimated reach: ${reach.toLocaleString('en-IN')}`,
+            region: campaign.region,
+            language: campaign.language,
+            strategy: `${campaign.language} content for ${campaign.businessType} — goal: ${campaign.input.slice(0, 80)}`,
+            result: `BharatScore: ${score}/100. Estimated reach: ${reach.toLocaleString('en-IN')}`,
             lesson,
-            campaignId:   campaign.id,
+            campaignId: campaign.id,
         });
         logger.info('Learning lesson saved to DynamoDB', { campaignId: campaign.id, score });
     } catch (err: unknown) {
@@ -139,44 +167,83 @@ async function extractAndSaveLesson(campaign: Campaign, quality: any, distributi
 
 // ─── Main Pipeline ────────────────────────────────────────────────────────────
 export async function runPipeline(campaignId: string, campaign: Campaign, broadcast: BroadcastFn) {
-    let research: any    = null;
-    let creative: any    = null;
-    let quality: any     = null;
+    let research: any = null;
+    let creative: any = null;
+    let quality: any = null;
     let distribution: any = null;
 
     try {
         // ── Stage 1: Research Agent ──────────────────────────────────────────
         const t1Start = Date.now();
-        broadcast({ type: 'stage_update', campaignId, stage: 1, label: 'Research Agent', status: 'running',
-            detail: `Analysing ${campaign.businessType} market signals for ${campaign.region.join(', ')}…` });
+        broadcast({
+            type: 'stage_update',
+            campaignId,
+            stage: 1,
+            label: 'Research Agent',
+            status: 'running',
+            detail: `Analysing ${campaign.businessType} market signals for ${campaign.region.join(', ')}…`,
+        });
 
-        research = await withTimeout(
-            runResearchAgent(campaign),
-            30_000,
+        research = await withTimeout(runResearchAgent(campaign), 30_000, {
+            trendingFormats: ['Short-form video', 'Carousel posts', 'Customer testimonials'],
+            demographics: `Local audience in ${campaign.region.join(', ')}`,
+            bestPostingTimes: {
+                instagram: '7:00 PM IST',
+                facebook: '12:00 PM IST',
+                whatsapp: '9:00 AM IST',
+                youtube: '6:00 PM IST',
+                twitter: '11:00 AM IST',
+            },
+            hashtags: [
+                `#${campaign.businessType.replace(/\s+/g, '')}`,
+                '#VocalForLocal',
+                '#MadeInIndia',
+            ],
+            culturalContext: `Authentic regional identity from ${campaign.region[0] || 'India'}`,
+            competitorInsights: 'Focus on quality and storytelling over discounts',
+            evidence: ['Fallback: Bedrock unavailable'],
+            historicalLessons: [],
+        });
+        await trace(
+            campaignId,
+            'research_market',
+            { region: campaign.region, businessType: campaign.businessType },
             {
-                trendingFormats:  ['Short-form video', 'Carousel posts', 'Customer testimonials'],
-                demographics:     `Local audience in ${campaign.region.join(', ')}`,
-                bestPostingTimes: { instagram: '7:00 PM IST', facebook: '12:00 PM IST', whatsapp: '9:00 AM IST', youtube: '6:00 PM IST', twitter: '11:00 AM IST' },
-                hashtags:         [`#${campaign.businessType.replace(/\s+/g, '')}`, '#VocalForLocal', '#MadeInIndia'],
-                culturalContext:  `Authentic regional identity from ${campaign.region[0] || 'India'}`,
-                competitorInsights: 'Focus on quality and storytelling over discounts',
-                evidence:         ['Fallback: Bedrock unavailable'],
-                historicalLessons: [],
-            }
+                evidenceCount: research.evidence?.length ?? 0,
+                hashtagCount: research.hashtags?.length ?? 0,
+            },
+            Date.now() - t1Start
         );
-        await trace(campaignId, 'research_market', { region: campaign.region, businessType: campaign.businessType }, { evidenceCount: research.evidence?.length ?? 0, hashtagCount: research.hashtags?.length ?? 0 }, Date.now() - t1Start);
-        broadcast({ type: 'stage_update', campaignId, stage: 1, label: 'Research Agent', status: 'done',
-            detail: `Market intelligence ready — ${research.hashtags?.length ?? 0} hashtags, ${research.evidence?.length ?? 0} signals ✅` });
+        broadcast({
+            type: 'stage_update',
+            campaignId,
+            stage: 1,
+            label: 'Research Agent',
+            status: 'done',
+            detail: `Market intelligence ready — ${research.hashtags?.length ?? 0} hashtags, ${research.evidence?.length ?? 0} signals ✅`,
+        });
 
         // ── Stages 2+3 PARALLEL: Creative Swarm ∥ Quality Pre-Check ──────────
         // CaseGraph-inspired: both stages depend only on Research output.
         // Run them in parallel via Promise.all — saves 15-25s vs sequential.
         // If Creative fails, ONLY Creative is retried (Research result preserved).
         const t2Start = Date.now();
-        broadcast({ type: 'stage_update', campaignId, stage: 2, label: 'Creative Swarm', status: 'running',
-            detail: `Generating ${campaign.language} captions + Titan image in parallel with quality pre-check…` });
-        broadcast({ type: 'stage_update', campaignId, stage: 3, label: 'Quality Guard', status: 'running',
-            detail: 'Pre-checking research signals for cultural sensitivity…' });
+        broadcast({
+            type: 'stage_update',
+            campaignId,
+            stage: 2,
+            label: 'Creative Swarm',
+            status: 'running',
+            detail: `Generating ${campaign.language} captions + Titan image in parallel with quality pre-check…`,
+        });
+        broadcast({
+            type: 'stage_update',
+            campaignId,
+            stage: 3,
+            label: 'Quality Guard',
+            status: 'running',
+            detail: 'Pre-checking research signals for cultural sensitivity…',
+        });
 
         let creativeAttempts = 0;
         const MAX_CREATIVE_ATTEMPTS = 2;
@@ -186,15 +253,25 @@ export async function runPipeline(campaignId: string, campaign: Campaign, broadc
             while (creativeAttempts < MAX_CREATIVE_ATTEMPTS) {
                 creativeAttempts++;
                 try {
-                    const result = await withTimeout(runCreativeSwarm(campaign, research), 60_000, null);
+                    const result = await withTimeout(
+                        runCreativeSwarm(campaign, research),
+                        60_000,
+                        null
+                    );
                     if (result) return result;
-                            if (creativeAttempts < MAX_CREATIVE_ATTEMPTS) {
+                    if (creativeAttempts < MAX_CREATIVE_ATTEMPTS) {
                         logger.warn('Creative attempt returned null — retrying', {
                             attempt: creativeAttempts,
                             maxAttempts: MAX_CREATIVE_ATTEMPTS,
                         });
-                        broadcast({ type: 'stage_update', campaignId, stage: 2, label: 'Creative Swarm', status: 'running',
-                            detail: `Retry ${creativeAttempts}/${MAX_CREATIVE_ATTEMPTS}: regenerating with stronger cultural prompt…` });
+                        broadcast({
+                            type: 'stage_update',
+                            campaignId,
+                            stage: 2,
+                            label: 'Creative Swarm',
+                            status: 'running',
+                            detail: `Retry ${creativeAttempts}/${MAX_CREATIVE_ATTEMPTS}: regenerating with stronger cultural prompt…`,
+                        });
                     }
                 } catch (err: unknown) {
                     if (creativeAttempts >= MAX_CREATIVE_ATTEMPTS) throw err;
@@ -211,7 +288,25 @@ export async function runPipeline(campaignId: string, campaign: Campaign, broadc
         const qualityPreCheck = withTimeout(
             runQualityGuard({ captions: { summary: research.culturalContext }, images: [] }),
             15_000,
-            { passed: true, bharatScore: { total: 80, culturalFit: 25, seoScore: 20, engagementPotential: 18, platformOptimization: 17 }, flags: [], categories: { toxicity: 'PASS', hate: 'PASS', brand: 'PASS', cultural: 'PASS', factualClaims: 'PASS' }, revisionSuggestions: [] }
+            {
+                passed: true,
+                bharatScore: {
+                    total: 80,
+                    culturalFit: 25,
+                    seoScore: 20,
+                    engagementPotential: 18,
+                    platformOptimization: 17,
+                },
+                flags: [],
+                categories: {
+                    toxicity: 'PASS',
+                    hate: 'PASS',
+                    brand: 'PASS',
+                    cultural: 'PASS',
+                    factualClaims: 'PASS',
+                },
+                revisionSuggestions: [],
+            }
         );
 
         // Run both in parallel — CaseGraph Promise.all
@@ -222,48 +317,113 @@ export async function runPipeline(campaignId: string, campaign: Campaign, broadc
         creative = creativeResult;
 
         const t2End = Date.now();
-        await trace(campaignId, 'creative_swarm', { language: campaign.language, attempts: creativeAttempts },
-            { imageCount: creative.images?.length ?? 0, platformCount: Object.keys(creative.captions || {}).length }, t2End - t2Start);
-        broadcast({ type: 'stage_update', campaignId, stage: 2, label: 'Creative Swarm', status: 'done',
-            detail: `${creative.images?.length ?? 0} images, ${Object.keys(creative.captions || {}).length} captions${creativeAttempts > 1 ? ` (${creativeAttempts} attempts)` : ''} ✅` });
+        await trace(
+            campaignId,
+            'creative_swarm',
+            { language: campaign.language, attempts: creativeAttempts },
+            {
+                imageCount: creative.images?.length ?? 0,
+                platformCount: Object.keys(creative.captions || {}).length,
+            },
+            t2End - t2Start
+        );
+        broadcast({
+            type: 'stage_update',
+            campaignId,
+            stage: 2,
+            label: 'Creative Swarm',
+            status: 'done',
+            detail: `${creative.images?.length ?? 0} images, ${Object.keys(creative.captions || {}).length} captions${creativeAttempts > 1 ? ` (${creativeAttempts} attempts)` : ''} ✅`,
+        });
 
         // ── Stage 3 Final: Quality Guard on actual creative output ────────────
         const t3Start = Date.now();
         // Use pre-check flags as additional context — if pre-check caught flags, pass them to full guard
         const preFlags = preCheckResult?.flags ?? [];
-        broadcast({ type: 'stage_update', campaignId, stage: 3, label: 'Quality Guard', status: 'running',
-            detail: `Full safety check on creative output${preFlags.length > 0 ? ` (${preFlags.length} pre-check flags)` : ''}…` });
+        broadcast({
+            type: 'stage_update',
+            campaignId,
+            stage: 3,
+            label: 'Quality Guard',
+            status: 'running',
+            detail: `Full safety check on creative output${preFlags.length > 0 ? ` (${preFlags.length} pre-check flags)` : ''}…`,
+        });
 
         quality = await withTimeout(
             runQualityGuard({ ...creative, preCheckFlags: preFlags }),
             20_000,
-            preCheckResult   // if full check times out, use pre-check result
+            preCheckResult // if full check times out, use pre-check result
         );
-        await trace(campaignId, 'quality_guard',
+        await trace(
+            campaignId,
+            'quality_guard',
             { contentLength: JSON.stringify(creative).length, preFlags },
-            { score: quality.bharatScore.total, passed: quality.passed, flagCount: quality.flags.length },
-            Date.now() - t3Start);
-        broadcast({ type: 'stage_update', campaignId, stage: 3, label: 'Quality Guard', status: 'done',
-            detail: `BharatScore: ${quality.bharatScore.total}/100 · Toxicity: ${quality.categories?.toxicity} · Cultural: ${quality.categories?.cultural} ✅` });
+            {
+                score: quality.bharatScore.total,
+                passed: quality.passed,
+                flagCount: quality.flags.length,
+            },
+            Date.now() - t3Start
+        );
+        broadcast({
+            type: 'stage_update',
+            campaignId,
+            stage: 3,
+            label: 'Quality Guard',
+            status: 'done',
+            detail: `BharatScore: ${quality.bharatScore.total}/100 · Toxicity: ${quality.categories?.toxicity} · Cultural: ${quality.categories?.cultural} ✅`,
+        });
 
         // ── Stage 4: Distribution Agent ──────────────────────────────────────
         const t4Start = Date.now();
-        broadcast({ type: 'stage_update', campaignId, stage: 4, label: 'Distribution Agent', status: 'running',
-            detail: 'Calculating optimal posting times and estimated reach…' });
+        broadcast({
+            type: 'stage_update',
+            campaignId,
+            stage: 4,
+            label: 'Distribution Agent',
+            status: 'running',
+            detail: 'Calculating optimal posting times and estimated reach…',
+        });
 
-        distribution = await withTimeout(
-            runDistributionAgent(campaign, creative),
-            20_000,
-            { publishTimes: { instagram: '7:00 PM IST', facebook: '12:00 PM IST', whatsapp: '9:00 AM IST', youtube: '6:00 PM IST', twitter: '11:00 AM IST' }, suggestedInfluencers: [], estimatedReach: 20000 }
+        distribution = await withTimeout(runDistributionAgent(campaign, creative), 20_000, {
+            publishTimes: {
+                instagram: '7:00 PM IST',
+                facebook: '12:00 PM IST',
+                whatsapp: '9:00 AM IST',
+                youtube: '6:00 PM IST',
+                twitter: '11:00 AM IST',
+            },
+            suggestedInfluencers: [],
+            estimatedReach: 20000,
+        });
+        await trace(
+            campaignId,
+            'distribution_agent',
+            { region: campaign.region },
+            {
+                estimatedReach: distribution.estimatedReach,
+                bestTime: distribution.publishTimes?.instagram,
+            },
+            Date.now() - t4Start
         );
-        await trace(campaignId, 'distribution_agent', { region: campaign.region }, { estimatedReach: distribution.estimatedReach, bestTime: distribution.publishTimes?.instagram }, Date.now() - t4Start);
-        broadcast({ type: 'stage_update', campaignId, stage: 4, label: 'Distribution Agent', status: 'done',
-            detail: `Best time: ${distribution.publishTimes?.instagram ?? 'TBD'} · Est. reach: ${(distribution.estimatedReach ?? 0).toLocaleString('en-IN')} ✅` });
-
+        broadcast({
+            type: 'stage_update',
+            campaignId,
+            stage: 4,
+            label: 'Distribution Agent',
+            status: 'done',
+            detail: `Best time: ${distribution.publishTimes?.instagram ?? 'TBD'} · Est. reach: ${(distribution.estimatedReach ?? 0).toLocaleString('en-IN')} ✅`,
+        });
 
         // ── Stage 5: Finalise + Persist ──────────────────────────────────────
-        broadcast({ type: 'stage_update', campaignId, stage: 5, label: 'Published!', status: 'running',
-            detail: 'Saving campaign, creating A/B experiment, extracting learnings…' });
+        broadcast({
+            type: 'stage_update',
+            campaignId,
+            stage: 5,
+            label: 'Published!',
+            status: 'running',
+            detail: 'Saving campaign, creating A/B experiment, extracting learnings…',
+        });
 
         const finalContent = { ...creative, distribution, research };
 
@@ -272,12 +432,11 @@ export async function runPipeline(campaignId: string, campaign: Campaign, broadc
         // the content has not been modified after generation.
         const contentHash = computeContentHash(finalContent);
         await updateCampaign(campaignId, {
-            status:      'done',
-            content:     finalContent,
+            status: 'done',
+            content: finalContent,
             bharatScore: quality?.bharatScore ?? { total: 82 },
-            ...(({ contentHash } as any)),  // TS doesn't know Campaign.contentHash yet
+            ...({ contentHash } as any), // TS doesn't know Campaign.contentHash yet
         } as any);
-
 
         // 5b. Create A/B experiment (V3)
         let experiment: any = null;
@@ -289,7 +448,13 @@ export async function runPipeline(campaignId: string, campaign: Campaign, broadc
                 variants,
                 status: 'running',
             });
-            await trace(campaignId, 'experiment_engine', {}, { experimentId: experiment.id, variantCount: variants.length }, 0);
+            await trace(
+                campaignId,
+                'experiment_engine',
+                {},
+                { experimentId: experiment.id, variantCount: variants.length },
+                0
+            );
         } catch (expErr: unknown) {
             logger.warn('Experiment creation failed (non-critical)', {
                 campaignId,
@@ -301,26 +466,32 @@ export async function runPipeline(campaignId: string, campaign: Campaign, broadc
         await extractAndSaveLesson(campaign, quality, distribution);
 
         broadcast({
-            type: 'done', campaignId, stage: 5, label: 'Published!', status: 'done',
+            type: 'done',
+            campaignId,
+            stage: 5,
+            label: 'Published!',
+            status: 'done',
             detail: 'Campaign ready 🎉',
             data: {
-                content:     finalContent,
+                content: finalContent,
                 bharatScore: quality?.bharatScore ?? { total: 82 },
                 contentHash,
-                experiment:  experiment ? { id: experiment.id, variantCount: experiment.variants.length } : null,
-                agentTrace:  `GET /api/campaign/${campaignId}/trace`,
-            }
+                experiment: experiment
+                    ? { id: experiment.id, variantCount: experiment.variants.length }
+                    : null,
+                agentTrace: `GET /api/campaign/${campaignId}/trace`,
+            },
         });
-
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
         const stack = err instanceof Error ? err.stack : undefined;
         logger.error('Pipeline failed', { campaignId, error: message, stack });
         await updateCampaign(campaignId, { status: 'error' }).catch(() => {});
         broadcast({
-            type: 'error', campaignId,
+            type: 'error',
+            campaignId,
             message: `Pipeline failed: ${message}`,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
         });
     }
 }

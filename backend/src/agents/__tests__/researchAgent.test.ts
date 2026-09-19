@@ -73,7 +73,10 @@ const validResearchJson: ResearchOutput = {
     hashtags: ['#MumbaiFood', '#DiwaliSpecial', '#ThaliLovers', '#MadeInIndia'],
     culturalContext: 'Diwali is peak festive season — emphasise family and celebration',
     competitorInsights: 'Competitors focus on discounts; differentiate on authenticity',
-    evidence: ['Signal 1: Festival season drives 3x engagement', 'Signal 2: Short-form video preferred'],
+    evidence: [
+        'Signal 1: Festival season drives 3x engagement',
+        'Signal 2: Short-form video preferred',
+    ],
 };
 
 // ─── Tests ────────────────────────────────────────────────────────────────────

@@ -1,6 +1,7 @@
 import type { Campaign, AnalyticsData } from './types';
 
-export const DEMO_VOICE_TEXT = "Mera naam Raju hai, main Varanasi mein silk sarees bechta hoon. Mujhe Diwali ke liye ek campaign chahiye jo Instagram aur WhatsApp par Hindi mein ho.";
+export const DEMO_VOICE_TEXT =
+    'Mera naam Raju hai, main Varanasi mein silk sarees bechta hoon. Mujhe Diwali ke liye ek campaign chahiye jo Instagram aur WhatsApp par Hindi mein ho.';
 
 export const MOCK_CAMPAIGN: Campaign = {
     id: 'demo-001',
@@ -23,15 +24,38 @@ export const MOCK_CAMPAIGN: Campaign = {
     },
     content: {
         images: [
-            { id: 'img-1', url: 'https://picsum.photos/seed/saree1/800/600', platform: 'instagram', caption: 'दिवाली की रोशनी में चमकती वाराणसी की रेशमी साड़ियाँ ✨🪔' },
-            { id: 'img-2', url: 'https://picsum.photos/seed/saree2/800/600', platform: 'facebook', caption: 'बनारसी सिल्क की अद्भुत कला — हर त्योहार को खास बनाएं!' },
-            { id: 'img-3', url: 'https://picsum.photos/seed/saree3/800/600', platform: 'whatsapp', caption: 'सीमित समय के लिए: 30% की छूट! आज ही ऑर्डर करें 📱' },
-            { id: 'img-4', url: 'https://picsum.photos/seed/saree4/800/600', platform: 'youtube', caption: 'Banarasi Silk — The Pride of Varanasi 🌟' },
+            {
+                id: 'img-1',
+                url: 'https://picsum.photos/seed/saree1/800/600',
+                platform: 'instagram',
+                caption: 'दिवाली की रोशनी में चमकती वाराणसी की रेशमी साड़ियाँ ✨🪔',
+            },
+            {
+                id: 'img-2',
+                url: 'https://picsum.photos/seed/saree2/800/600',
+                platform: 'facebook',
+                caption: 'बनारसी सिल्क की अद्भुत कला — हर त्योहार को खास बनाएं!',
+            },
+            {
+                id: 'img-3',
+                url: 'https://picsum.photos/seed/saree3/800/600',
+                platform: 'whatsapp',
+                caption: 'सीमित समय के लिए: 30% की छूट! आज ही ऑर्डर करें 📱',
+            },
+            {
+                id: 'img-4',
+                url: 'https://picsum.photos/seed/saree4/800/600',
+                platform: 'youtube',
+                caption: 'Banarasi Silk — The Pride of Varanasi 🌟',
+            },
         ],
         captions: {
-            instagram: '✨ दिवाली की रोशनी में और भी चमकें! 🪔\n\nवाराणसी की असली बनारसी सिल्क साड़ियाँ अब आपके दरवाज़े पर। हर धागे में बुनी है सदियों की कला। \n\n🎁 दिवाली स्पेशल: 30% छूट — सिर्फ 5 दिन!\n\n#BanarasiSilk #DiwaliSpecial #VaranasiSaree #IndianFashion #HandloomIndia',
-            facebook: 'नमस्ते दोस्तों! 🙏 दिवाली का त्योहार नज़दीक है और हम लेकर आए हैं एक खास ऑफर। राजू सिल्क हाउस, वाराणसी — जहाँ 50 साल से बुनी जा रही हैं असली बनारसी साड़ियाँ।\n\n✅ 100% शुद्ध सिल्क\n✅ हाथ से बुनी गई\n✅ दिवाली स्पेशल: 30% छूट\n✅ होम डिलीवरी उपलब्ध\n\nआज ही संपर्क करें! 📞',
-            twitter: '✨ दिवाली Special: बनारसी सिल्क पर 30% छूट! 🪔 Real handloom from Varanasi. Limited stock. DM us now! #DiwaliSale #BanarasiSaree #MadeInIndia',
+            instagram:
+                '✨ दिवाली की रोशनी में और भी चमकें! 🪔\n\nवाराणसी की असली बनारसी सिल्क साड़ियाँ अब आपके दरवाज़े पर। हर धागे में बुनी है सदियों की कला। \n\n🎁 दिवाली स्पेशल: 30% छूट — सिर्फ 5 दिन!\n\n#BanarasiSilk #DiwaliSpecial #VaranasiSaree #IndianFashion #HandloomIndia',
+            facebook:
+                'नमस्ते दोस्तों! 🙏 दिवाली का त्योहार नज़दीक है और हम लेकर आए हैं एक खास ऑफर। राजू सिल्क हाउस, वाराणसी — जहाँ 50 साल से बुनी जा रही हैं असली बनारसी साड़ियाँ।\n\n✅ 100% शुद्ध सिल्क\n✅ हाथ से बुनी गई\n✅ दिवाली स्पेशल: 30% छूट\n✅ होम डिलीवरी उपलब्ध\n\nआज ही संपर्क करें! 📞',
+            twitter:
+                '✨ दिवाली Special: बनारसी सिल्क पर 30% छूट! 🪔 Real handloom from Varanasi. Limited stock. DM us now! #DiwaliSale #BanarasiSaree #MadeInIndia',
             youtube: `📹 Raju Silk House — Varanasi's Finest Banarasi Sarees | Diwali Special 2026
 
 🎬 SCRIPT (60 seconds):
@@ -43,11 +67,20 @@ export const MOCK_CAMPAIGN: Campaign = {
         },
         seo: {
             title: 'Buy Authentic Banarasi Silk Sarees Online | Raju Silk House Varanasi — Diwali Sale 2026',
-            metaDescription: 'Shop genuine handloom Banarasi silk sarees from Varanasi. Get 30% off this Diwali. Free shipping across India. Certificate of authenticity included.',
+            metaDescription:
+                'Shop genuine handloom Banarasi silk sarees from Varanasi. Get 30% off this Diwali. Free shipping across India. Certificate of authenticity included.',
             keywords: [
-                'banarasi silk saree', 'varanasi silk online', 'banarasi saree diwali', 'handloom silk india',
-                'बनारसी साड़ी', 'वाराणसी सिल्क', 'दिवाली साड़ी ऑफर', 'pure silk saree price',
-                'buy banarasi saree online', 'original banarasi silk', 'silk saree varanasi',
+                'banarasi silk saree',
+                'varanasi silk online',
+                'banarasi saree diwali',
+                'handloom silk india',
+                'बनारसी साड़ी',
+                'वाराणसी सिल्क',
+                'दिवाली साड़ी ऑफर',
+                'pure silk saree price',
+                'buy banarasi saree online',
+                'original banarasi silk',
+                'silk saree varanasi',
             ],
             blogOutline: [
                 'Why Banarasi Silk is UNESCO-recognized',
@@ -61,7 +94,16 @@ export const MOCK_CAMPAIGN: Campaign = {
             message: `🙏 Namaskar! Raju Silk House se Diwali ki shubhkamnayein! ✨\n\n30% chhoot — sirf aaj ke liye!\nOrder karein: +91 98765 43210`,
             statusText: '✨ दिवाली Special! बनारसी सिल्क पर 30% छूट 🪔 Raju Silk House, Varanasi',
         },
-        hashtags: ['#BanarasiSilk', '#VaranasiSaree', '#DiwaliSpecial', '#MadeInIndia', '#HandloomIndia', '#IndianFashion', '#DiwaliSale2026', '#VocalForLocal'],
+        hashtags: [
+            '#BanarasiSilk',
+            '#VaranasiSaree',
+            '#DiwaliSpecial',
+            '#MadeInIndia',
+            '#HandloomIndia',
+            '#IndianFashion',
+            '#DiwaliSale2026',
+            '#VocalForLocal',
+        ],
         publishTimes: {
             instagram: '7:00 PM IST',
             facebook: '12:00 PM IST',
@@ -98,10 +140,17 @@ export const MOCK_ANALYTICS: AnalyticsData = {
         { language: 'Gujarati', count: 1, color: '#A855F7' },
     ],
     stateData: {
-        'Uttar Pradesh': 85, 'Maharashtra': 78, 'Tamil Nadu': 72,
-        'West Bengal': 68, 'Karnataka': 65, 'Gujarat': 60,
-        'Rajasthan': 55, 'Andhra Pradesh': 52, 'Delhi': 90,
-        'Punjab': 48, 'Madhya Pradesh': 42,
+        'Uttar Pradesh': 85,
+        Maharashtra: 78,
+        'Tamil Nadu': 72,
+        'West Bengal': 68,
+        Karnataka: 65,
+        Gujarat: 60,
+        Rajasthan: 55,
+        'Andhra Pradesh': 52,
+        Delhi: 90,
+        Punjab: 48,
+        'Madhya Pradesh': 42,
     },
 };
 
@@ -112,7 +161,7 @@ export const TESTIMONIALS = [
         city: 'Tamil Nadu',
         language: 'Tamil',
         quote: 'இந்த app இல்லாம என்னால தமிழ்ல Facebook post போட முடியாது. இப்போ என் sales 3x ஆச்சு! 🙏',
-        quoteEn: 'Without this app I couldn\'t post in Tamil. Now my sales are 3x!',
+        quoteEn: "Without this app I couldn't post in Tamil. Now my sales are 3x!",
         rating: 5,
         avatar: 'meena',
     },
@@ -139,26 +188,150 @@ export const TESTIMONIALS = [
 ];
 
 export const FEATURES = [
-    { icon: '🎙️', title: 'Voice-to-Campaign', desc: 'Speak your idea in any Indian language', impact: '10 min vs 6 hrs', stat: '36x', color: '#FF6B35' },
-    { icon: '🌐', title: '22+ Language Support', desc: 'All official Indian languages + dialects', impact: '3x audience reach', stat: '3×', color: '#F7C948' },
-    { icon: '🎬', title: 'AI Video Generation', desc: 'Nova Reel creates 15-second reels', impact: '₹50,000 → ₹0 cost', stat: '₹0', color: '#00D4FF' },
-    { icon: '💬', title: 'WhatsApp Integration', desc: 'Reach 490M Indian users directly', impact: '490M potential users', stat: '490M', color: '#25D366' },
-    { icon: '⏰', title: 'Smart Scheduling', desc: 'AI picks peak engagement times', impact: '40% higher engagement', stat: '+40%', color: '#FF6B35' },
-    { icon: '🔍', title: 'SEO Optimizer', desc: 'Regional keywords in native script', impact: '5x search visibility', stat: '5×', color: '#F7C948' },
-    { icon: '🛡️', title: 'Cultural Guardrails', desc: 'Prevents cultural insensitivity', impact: '100% brand safety', stat: '100%', color: '#00D4FF' },
-    { icon: '📊', title: 'Hyperlocal Analytics', desc: 'State & language performance tracking', impact: 'Per-state insights', stat: '28+', color: '#A855F7' },
-    { icon: '🤝', title: 'Influencer Matching', desc: 'AI finds micro-influencers in your region', impact: '80% lower cost', stat: '-80%', color: '#00FF88' },
-    { icon: '🎪', title: 'Festival Pricing', desc: 'Auto-create festival campaigns', impact: '25% revenue boost', stat: '+25%', color: '#FF6B35' },
+    {
+        icon: '🎙️',
+        title: 'Voice-to-Campaign',
+        desc: 'Speak your idea in any Indian language',
+        impact: '10 min vs 6 hrs',
+        stat: '36x',
+        color: '#FF6B35',
+    },
+    {
+        icon: '🌐',
+        title: '22+ Language Support',
+        desc: 'All official Indian languages + dialects',
+        impact: '3x audience reach',
+        stat: '3×',
+        color: '#F7C948',
+    },
+    {
+        icon: '🎬',
+        title: 'AI Video Generation',
+        desc: 'Nova Reel creates 15-second reels',
+        impact: '₹50,000 → ₹0 cost',
+        stat: '₹0',
+        color: '#00D4FF',
+    },
+    {
+        icon: '💬',
+        title: 'WhatsApp Integration',
+        desc: 'Reach 490M Indian users directly',
+        impact: '490M potential users',
+        stat: '490M',
+        color: '#25D366',
+    },
+    {
+        icon: '⏰',
+        title: 'Smart Scheduling',
+        desc: 'AI picks peak engagement times',
+        impact: '40% higher engagement',
+        stat: '+40%',
+        color: '#FF6B35',
+    },
+    {
+        icon: '🔍',
+        title: 'SEO Optimizer',
+        desc: 'Regional keywords in native script',
+        impact: '5x search visibility',
+        stat: '5×',
+        color: '#F7C948',
+    },
+    {
+        icon: '🛡️',
+        title: 'Cultural Guardrails',
+        desc: 'Prevents cultural insensitivity',
+        impact: '100% brand safety',
+        stat: '100%',
+        color: '#00D4FF',
+    },
+    {
+        icon: '📊',
+        title: 'Hyperlocal Analytics',
+        desc: 'State & language performance tracking',
+        impact: 'Per-state insights',
+        stat: '28+',
+        color: '#A855F7',
+    },
+    {
+        icon: '🤝',
+        title: 'Influencer Matching',
+        desc: 'AI finds micro-influencers in your region',
+        impact: '80% lower cost',
+        stat: '-80%',
+        color: '#00FF88',
+    },
+    {
+        icon: '🎪',
+        title: 'Festival Pricing',
+        desc: 'Auto-create festival campaigns',
+        impact: '25% revenue boost',
+        stat: '+25%',
+        color: '#FF6B35',
+    },
 ];
 
 export const COMPARISON_DATA = [
-    { feature: 'Indian Language Support', bharatMedia: true, chatGPT: false, canva: false, socialTools: false },
-    { feature: 'Voice Input (Any Language)', bharatMedia: true, chatGPT: false, canva: false, socialTools: false },
-    { feature: 'Culture-Aware Content', bharatMedia: true, chatGPT: false, canva: false, socialTools: false },
-    { feature: 'Festival Campaign AI', bharatMedia: true, chatGPT: false, canva: false, socialTools: false },
-    { feature: 'WhatsApp Publishing', bharatMedia: true, chatGPT: false, canva: false, socialTools: true },
-    { feature: 'AI Video Generation', bharatMedia: true, chatGPT: false, canva: false, socialTools: false },
-    { feature: 'Regional SEO Keywords', bharatMedia: true, chatGPT: true, canva: false, socialTools: false },
-    { feature: 'BharatScore Analytics', bharatMedia: true, chatGPT: false, canva: false, socialTools: false },
-    { feature: 'SMB-Priced (₹99/mo)', bharatMedia: true, chatGPT: false, canva: true, socialTools: false },
+    {
+        feature: 'Indian Language Support',
+        bharatMedia: true,
+        chatGPT: false,
+        canva: false,
+        socialTools: false,
+    },
+    {
+        feature: 'Voice Input (Any Language)',
+        bharatMedia: true,
+        chatGPT: false,
+        canva: false,
+        socialTools: false,
+    },
+    {
+        feature: 'Culture-Aware Content',
+        bharatMedia: true,
+        chatGPT: false,
+        canva: false,
+        socialTools: false,
+    },
+    {
+        feature: 'Festival Campaign AI',
+        bharatMedia: true,
+        chatGPT: false,
+        canva: false,
+        socialTools: false,
+    },
+    {
+        feature: 'WhatsApp Publishing',
+        bharatMedia: true,
+        chatGPT: false,
+        canva: false,
+        socialTools: true,
+    },
+    {
+        feature: 'AI Video Generation',
+        bharatMedia: true,
+        chatGPT: false,
+        canva: false,
+        socialTools: false,
+    },
+    {
+        feature: 'Regional SEO Keywords',
+        bharatMedia: true,
+        chatGPT: true,
+        canva: false,
+        socialTools: false,
+    },
+    {
+        feature: 'BharatScore Analytics',
+        bharatMedia: true,
+        chatGPT: false,
+        canva: false,
+        socialTools: false,
+    },
+    {
+        feature: 'SMB-Priced (₹99/mo)',
+        bharatMedia: true,
+        chatGPT: false,
+        canva: true,
+        socialTools: false,
+    },
 ];

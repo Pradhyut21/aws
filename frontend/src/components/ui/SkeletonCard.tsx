@@ -1,4 +1,10 @@
-export default function SkeletonCard({ lines = 3, className = '' }: { lines?: number; className?: string }) {
+export default function SkeletonCard({
+    lines = 3,
+    className = '',
+}: {
+    lines?: number;
+    className?: string;
+}) {
     return (
         <div className={`glass-card p-5 animate-pulse ${className}`}>
             <div className="flex items-start gap-3 mb-4">
@@ -9,7 +15,11 @@ export default function SkeletonCard({ lines = 3, className = '' }: { lines?: nu
                 </div>
             </div>
             {Array.from({ length: lines }).map((_, i) => (
-                <div key={i} className="h-2 bg-white/8 rounded-full mb-2" style={{ width: `${100 - i * 15}%` }} />
+                <div
+                    key={i}
+                    className="h-2 bg-white/8 rounded-full mb-2"
+                    style={{ width: `${100 - i * 15}%` }}
+                />
             ))}
             <div className="h-6 bg-white/8 rounded-lg mt-4 w-1/3" />
         </div>

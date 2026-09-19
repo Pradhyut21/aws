@@ -30,14 +30,16 @@ const PosterStudio = lazy(() => import('./pages/PosterStudio'));
 const TransliterationEngine = lazy(() => import('./pages/TransliterationEngine'));
 const GitHubIdeasHub = lazy(() => import('./pages/GitHubIdeasHub'));
 
-
 function PageLoader() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-bg-primary">
             <div className="flex flex-col items-center gap-4">
                 <div className="relative">
                     <div className="w-12 h-12 rounded-full border-2 border-orange-500 border-t-transparent animate-spin" />
-                    <div className="absolute inset-1 rounded-full border border-yellow-500/40 border-t-transparent animate-spin" style={{ animationDirection: 'reverse' }} />
+                    <div
+                        className="absolute inset-1 rounded-full border border-yellow-500/40 border-t-transparent animate-spin"
+                        style={{ animationDirection: 'reverse' }}
+                    />
                 </div>
                 <p className="text-slate-400 font-mono text-sm">Loading BharatMedia...</p>
             </div>
@@ -49,17 +51,17 @@ function PageLoader() {
 function GlobalShortcuts() {
     const navigate = useNavigate();
     useKeyboardShortcuts([
-        { key: 'n', description: 'New campaign',    handler: () => navigate('/campaign/new') },
-        { key: 'd', description: 'Dashboard',        handler: () => navigate('/dashboard') },
-        { key: 'a', description: 'Analytics',        handler: () => navigate('/analytics') },
-        { key: 'c', description: 'Calendar',         handler: () => navigate('/calendar') },
-        { key: 't', description: 'Templates',        handler: () => navigate('/templates') },
-        { key: 'b', description: 'BharatBrain',      handler: () => navigate('/brain') },
-        { key: 'e', description: 'Experiment Lab',   handler: () => navigate('/experiments') },
-        { key: 'm', description: 'Market Pulse',     handler: () => navigate('/market-pulse') },
-        { key: 'f', description: 'Focus Group',      handler: () => navigate('/focus-group') },
-        { key: 'p', description: 'Poster Studio',    handler: () => navigate('/poster-studio') },
-        { key: 'i', description: 'Ideas Hub',         handler: () => navigate('/ideas') },
+        { key: 'n', description: 'New campaign', handler: () => navigate('/campaign/new') },
+        { key: 'd', description: 'Dashboard', handler: () => navigate('/dashboard') },
+        { key: 'a', description: 'Analytics', handler: () => navigate('/analytics') },
+        { key: 'c', description: 'Calendar', handler: () => navigate('/calendar') },
+        { key: 't', description: 'Templates', handler: () => navigate('/templates') },
+        { key: 'b', description: 'BharatBrain', handler: () => navigate('/brain') },
+        { key: 'e', description: 'Experiment Lab', handler: () => navigate('/experiments') },
+        { key: 'm', description: 'Market Pulse', handler: () => navigate('/market-pulse') },
+        { key: 'f', description: 'Focus Group', handler: () => navigate('/focus-group') },
+        { key: 'p', description: 'Poster Studio', handler: () => navigate('/poster-studio') },
+        { key: 'i', description: 'Ideas Hub', handler: () => navigate('/ideas') },
     ]);
     return null;
 }
@@ -97,7 +99,6 @@ export default function App() {
                     <Route path="/poster-studio" element={<PosterStudio />} />
                     <Route path="/transliteration" element={<TransliterationEngine />} />
                     <Route path="/ideas" element={<GitHubIdeasHub />} />
-
                 </Routes>
             </Suspense>
         </ErrorBoundary>

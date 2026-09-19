@@ -12,7 +12,7 @@
 const mockSend = jest.fn();
 jest.mock('@aws-sdk/client-bedrock-runtime', () => ({
     BedrockRuntimeClient: jest.fn().mockImplementation(() => ({ send: mockSend })),
-    InvokeModelCommand: jest.fn().mockImplementation((params) => ({ params })),
+    InvokeModelCommand: jest.fn().mockImplementation(params => ({ params })),
 }));
 
 jest.mock('@aws-sdk/client-s3', () => ({

@@ -6,9 +6,11 @@ interface VoiceRecorderProps {
 }
 
 export default function VoiceRecorder({ onRecordingComplete }: VoiceRecorderProps) {
-    const { isRecording, audioBlob, waveformData, duration, error, start, stop, reset } = useVoiceRecorder();
+    const { isRecording, audioBlob, waveformData, duration, error, start, stop, reset } =
+        useVoiceRecorder();
 
-    const formatDuration = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    const formatDuration = (s: number) =>
+        `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
     const handleStop = () => {
         stop();
@@ -22,7 +24,10 @@ export default function VoiceRecorder({ onRecordingComplete }: VoiceRecorderProp
                 {isRecording && (
                     <>
                         <span className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-30" />
-                        <span className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-20" style={{ animationDelay: '0.5s' }} />
+                        <span
+                            className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-20"
+                            style={{ animationDelay: '0.5s' }}
+                        />
                     </>
                 )}
                 <button
@@ -97,8 +102,12 @@ export default function VoiceRecorder({ onRecordingComplete }: VoiceRecorderProp
                         animate={{ opacity: 1 }}
                         className="text-center"
                     >
-                        <p className="text-slate-300 font-medium">Tap the mic and speak in your language</p>
-                        <p className="text-slate-500 text-sm mt-1">Hindi, Tamil, Bengali, Kannada, Telugu or any Indian language</p>
+                        <p className="text-slate-300 font-medium">
+                            Tap the mic and speak in your language
+                        </p>
+                        <p className="text-slate-500 text-sm mt-1">
+                            Hindi, Tamil, Bengali, Kannada, Telugu or any Indian language
+                        </p>
                     </motion.div>
                 )}
             </AnimatePresence>

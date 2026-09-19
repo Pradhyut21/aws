@@ -17,7 +17,9 @@ function latLonToVec3(lat: number, lon: number, radius: number): THREE.Vector3 {
 
 function Globe() {
     const meshRef = useRef<THREE.Mesh>(null);
-    useFrame(() => { if (meshRef.current) meshRef.current.rotation.y += 0.003; });
+    useFrame(() => {
+        if (meshRef.current) meshRef.current.rotation.y += 0.003;
+    });
 
     // City dots
     const cityPositions = CITY_COORDINATES.map(c => latLonToVec3(c.lat, c.lon, 2.02));
@@ -49,7 +51,12 @@ function Globe() {
                     {/* Glow ring */}
                     <mesh position={pos}>
                         <ringGeometry args={[0.04, 0.07, 16]} />
-                        <meshBasicMaterial color="#F7C948" transparent opacity={0.6} side={THREE.DoubleSide} />
+                        <meshBasicMaterial
+                            color="#F7C948"
+                            transparent
+                            opacity={0.6}
+                            side={THREE.DoubleSide}
+                        />
                     </mesh>
                 </group>
             ))}

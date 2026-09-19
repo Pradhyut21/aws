@@ -29,14 +29,25 @@ export default function ComparisonTable() {
                         <table className="w-full text-sm">
                             <thead>
                                 <tr>
-                                    <th className="text-left p-4 text-slate-400 font-medium bg-[#0D1B40]">Feature</th>
+                                    <th className="text-left p-4 text-slate-400 font-medium bg-[#0D1B40]">
+                                        Feature
+                                    </th>
                                     {COLUMNS.map(col => (
-                                        <th key={col.key}
+                                        <th
+                                            key={col.key}
                                             className={`p-4 text-center font-semibold font-poppins ${col.highlight ? 'gradient-text text-base' : 'text-slate-300'}`}
-                                            style={{ background: col.highlight ? 'rgba(255,107,53,0.08)' : '#0D1B40' }}
+                                            style={{
+                                                background: col.highlight
+                                                    ? 'rgba(255,107,53,0.08)'
+                                                    : '#0D1B40',
+                                            }}
                                         >
                                             {col.label}
-                                            {col.highlight && <span className="block text-[10px] font-normal text-orange-400/70">⭐ Best</span>}
+                                            {col.highlight && (
+                                                <span className="block text-[10px] font-normal text-orange-400/70">
+                                                    ⭐ Best
+                                                </span>
+                                            )}
                                         </th>
                                     ))}
                                 </tr>
@@ -52,14 +63,25 @@ export default function ComparisonTable() {
                                     >
                                         <td className="p-4 text-slate-300">{row.feature}</td>
                                         {COLUMNS.map(col => (
-                                            <td key={col.key}
+                                            <td
+                                                key={col.key}
                                                 className="p-4 text-center"
-                                                style={{ background: col.highlight ? 'rgba(255,107,53,0.04)' : 'transparent' }}
+                                                style={{
+                                                    background: col.highlight
+                                                        ? 'rgba(255,107,53,0.04)'
+                                                        : 'transparent',
+                                                }}
                                             >
                                                 {(row as Record<string, unknown>)[col.key] ? (
-                                                    <span className={`text-lg ${col.highlight ? 'text-green-400' : 'text-green-600/70'}`}>✓</span>
+                                                    <span
+                                                        className={`text-lg ${col.highlight ? 'text-green-400' : 'text-green-600/70'}`}
+                                                    >
+                                                        ✓
+                                                    </span>
                                                 ) : (
-                                                    <span className="text-red-500/50 text-lg">✗</span>
+                                                    <span className="text-red-500/50 text-lg">
+                                                        ✗
+                                                    </span>
                                                 )}
                                             </td>
                                         ))}

@@ -59,7 +59,7 @@ function log(level: LogLevel, message: string, meta?: LogMeta): void {
 
 export const logger = {
     debug: (message: string, meta?: LogMeta) => log('debug', message, meta),
-    info:  (message: string, meta?: LogMeta) => log('info',  message, meta),
-    warn:  (message: string, meta?: LogMeta) => log('warn',  message, meta),
+    info: (message: string, meta?: LogMeta) => log('info', message, meta),
+    warn: (message: string, meta?: LogMeta) => log('warn', message, meta),
     error: (message: string, meta?: LogMeta) => log('error', message, meta),
 };

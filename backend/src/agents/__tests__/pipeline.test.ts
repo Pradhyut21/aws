@@ -16,7 +16,9 @@ jest.mock('@aws-sdk/client-dynamodb', () => ({
 }));
 jest.mock('@aws-sdk/lib-dynamodb', () => ({
     DynamoDBDocumentClient: { from: jest.fn().mockReturnValue({ send: jest.fn() }) },
-    PutCommand: jest.fn(), GetCommand: jest.fn(), QueryCommand: jest.fn(),
+    PutCommand: jest.fn(),
+    GetCommand: jest.fn(),
+    QueryCommand: jest.fn(),
 }));
 jest.mock('@aws-sdk/client-bedrock-runtime', () => ({
     BedrockRuntimeClient: jest.fn().mockImplementation(() => ({ send: jest.fn() })),
@@ -41,7 +43,12 @@ import { runCreativeSwarm } from '../creativeSwarm';
 import { runQualityGuard } from '../qualityGuard';
 import { runDistributionAgent } from '../distributionAgent';
 import { getCampaign, updateCampaign } from '../../services/store';
-import { saveTraceStep, createExperiment, saveLessonLearned, computeContentHash } from '../../services/v3store';
+import {
+    saveTraceStep,
+    createExperiment,
+    saveLessonLearned,
+    computeContentHash,
+} from '../../services/v3store';
 import { invokeNovaOmni } from '../../services/bedrock';
 import type { Campaign } from '../../services/store';
 
@@ -62,7 +69,13 @@ const mockCampaign: Campaign = {
 const mockResearch = {
     trendingFormats: ['Reels'],
     demographics: 'Women 25–50',
-    bestPostingTimes: { instagram: '7:00 PM IST', facebook: '12:00 PM IST', whatsapp: '9:00 AM IST', youtube: '6:00 PM IST', twitter: '11:00 AM IST' },
+    bestPostingTimes: {
+        instagram: '7:00 PM IST',
+        facebook: '12:00 PM IST',
+        whatsapp: '9:00 AM IST',
+        youtube: '6:00 PM IST',
+        twitter: '11:00 AM IST',
+    },
     hashtags: ['#Navratri', '#SilkSaree'],
     culturalContext: 'Navratri festival context',
     competitorInsights: 'Competitors focus on price',
@@ -80,14 +93,32 @@ const mockCreative = {
 
 const mockQuality = {
     passed: true,
-    bharatScore: { total: 88, culturalFit: 26, seoScore: 22, engagementPotential: 22, platformOptimization: 18 },
+    bharatScore: {
+        total: 88,
+        culturalFit: 26,
+        seoScore: 22,
+        engagementPotential: 22,
+        platformOptimization: 18,
+    },
     flags: [],
-    categories: { toxicity: 'PASS', hate: 'PASS', brand: 'PASS', cultural: 'PASS', factualClaims: 'PASS' },
+    categories: {
+        toxicity: 'PASS',
+        hate: 'PASS',
+        brand: 'PASS',
+        cultural: 'PASS',
+        factualClaims: 'PASS',
+    },
     revisionSuggestions: [],
 };
 
 const mockDistribution = {
-    publishTimes: { instagram: '7:00 PM IST', facebook: '12:00 PM IST', whatsapp: '9:00 AM IST', youtube: '6:00 PM IST', twitter: '11:00 AM IST' },
+    publishTimes: {
+        instagram: '7:00 PM IST',
+        facebook: '12:00 PM IST',
+        whatsapp: '9:00 AM IST',
+        youtube: '6:00 PM IST',
+        twitter: '11:00 AM IST',
+    },
     suggestedInfluencers: ['@jaipur_fashion'],
     estimatedReach: 45000,
 };
@@ -188,7 +219,7 @@ describe('runPipeline — error scenarios', () => {
     it('retries creative swarm up to MAX_CREATIVE_ATTEMPTS (2) times', async () => {
         // First attempt returns null (triggers retry), second succeeds
         (runCreativeSwarm as jest.Mock)
-            .mockResolvedValueOnce(null)  // attempt 1 → null
+            .mockResolvedValueOnce(null) // attempt 1 → null
             .mockResolvedValueOnce(mockCreative); // attempt 2 → success
 
         const events: object[] = [];

@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 // Add token to requests
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(config => {
     const token = localStorage.getItem('authToken');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -80,7 +80,10 @@ export const getCampaigns = async (): Promise<Campaign[]> => {
     return res.data;
 };
 
-export const publishCampaign = async (id: string, platforms: string[]): Promise<{ success: boolean }> => {
+export const publishCampaign = async (
+    id: string,
+    platforms: string[]
+): Promise<{ success: boolean }> => {
     const res = await api.post(`/campaign/${id}/publish`, { platforms });
     return res.data;
 };
@@ -165,7 +168,11 @@ export const getExperiment = async (id: string) => {
     return res.data;
 };
 
-export const updateExperimentMetrics = async (expId: string, variantId: string, metrics: Record<string, number>) => {
+export const updateExperimentMetrics = async (
+    expId: string,
+    variantId: string,
+    metrics: Record<string, number>
+) => {
     const res = await api.patch(`/experiments/${expId}/metrics`, { variantId, metrics });
     return res.data;
 };
@@ -183,9 +190,9 @@ export const uploadBrainDoc = async (file: File, type: string) => {
     const buffer = await file.arrayBuffer();
     const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
     const res = await api.post('/brain/upload', {
-        name:     file.name,
+        name: file.name,
         type,
-        content:  base64,
+        content: base64,
         mimeType: file.type || 'application/octet-stream',
     });
     return res.data;
@@ -236,7 +243,10 @@ export const getAuditLog = async () => {
 
 // ─── AMAZON POLLY — TTS ────────────────────────────────────────────────────
 
-export const synthesizeVoice = async (text: string, language: string = 'hi'): Promise<{
+export const synthesizeVoice = async (
+    text: string,
+    language: string = 'hi'
+): Promise<{
     audioUrl: string;
     voice: string;
     language: string;
@@ -266,7 +276,10 @@ export const translateCaptions = async (
 
 // ─── AMAZON COMPREHEND — Sentiment + Key Phrases ───────────────────────────
 
-export const analyzeCopy = async (text: string, language: string = 'en'): Promise<{
+export const analyzeCopy = async (
+    text: string,
+    language: string = 'en'
+): Promise<{
     sentiment: { label: string; scores: Record<string, number> };
     keyPhrases: { text: string; score: number }[];
     service: string;

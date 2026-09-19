@@ -13,9 +13,30 @@ interface FloatingCard {
 }
 
 const CARDS: FloatingCard[] = [
-    { platform: 'Instagram', color: '#E1306C', emoji: '📸', offset: [-3, 1, -1], rotationSpeed: 0.003, floatOffset: 0 },
-    { platform: 'WhatsApp', color: '#25D366', emoji: '💬', offset: [0, -1.5, -2], rotationSpeed: -0.004, floatOffset: 2 },
-    { platform: 'YouTube', color: '#FF0000', emoji: '▶️', offset: [3, 0.5, -1], rotationSpeed: 0.002, floatOffset: 4 },
+    {
+        platform: 'Instagram',
+        color: '#E1306C',
+        emoji: '📸',
+        offset: [-3, 1, -1],
+        rotationSpeed: 0.003,
+        floatOffset: 0,
+    },
+    {
+        platform: 'WhatsApp',
+        color: '#25D366',
+        emoji: '💬',
+        offset: [0, -1.5, -2],
+        rotationSpeed: -0.004,
+        floatOffset: 2,
+    },
+    {
+        platform: 'YouTube',
+        color: '#FF0000',
+        emoji: '▶️',
+        offset: [3, 0.5, -1],
+        rotationSpeed: 0.002,
+        floatOffset: 4,
+    },
 ];
 
 function FloatingCard3D({ card }: { card: FloatingCard }) {
@@ -70,12 +91,18 @@ export default function FloatingCards3D() {
     return (
         <Canvas
             camera={{ position: [0, 0, 7], fov: 55 }}
-            style={{ width: '100%', height: '100%', position: 'absolute', inset: 0, pointerEvents: 'none' }}
+            style={{
+                width: '100%',
+                height: '100%',
+                position: 'absolute',
+                inset: 0,
+                pointerEvents: 'none',
+            }}
             gl={{ antialias: true, alpha: true }}
         >
             <ambientLight intensity={0.5} />
             <pointLight position={[5, 5, 5]} color="#FF6B35" intensity={1} />
-            {CARDS.map((card) => (
+            {CARDS.map(card => (
                 <FloatingCard3D key={card.platform} card={card} />
             ))}
         </Canvas>

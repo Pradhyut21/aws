@@ -14,14 +14,15 @@ export default function LanguageSelector({ value, onChange }: LanguageSelectorPr
     const selected = INDIAN_LANGUAGES.find(l => l.code === value);
 
     useEffect(() => {
-        const handler = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false); };
+        const handler = (e: MouseEvent) => {
+            if (!ref.current?.contains(e.target as Node)) setOpen(false);
+        };
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    const filtered = INDIAN_LANGUAGES.filter(l =>
-        l.name.toLowerCase().includes(search.toLowerCase()) ||
-        l.nativeName.includes(search)
+    const filtered = INDIAN_LANGUAGES.filter(
+        l => l.name.toLowerCase().includes(search.toLowerCase()) || l.nativeName.includes(search)
     );
 
     return (
@@ -31,11 +32,17 @@ export default function LanguageSelector({ value, onChange }: LanguageSelectorPr
                 className="w-full glass-card px-4 py-3 flex items-center justify-between text-left hover:border-orange-500/40 transition-all"
             >
                 <span className="flex items-center gap-3">
-                    <span className="text-orange-400 font-mono text-sm">{selected?.script || 'Script'}</span>
-                    <span className="text-white font-medium">{selected?.name || 'Select Language'}</span>
+                    <span className="text-orange-400 font-mono text-sm">
+                        {selected?.script || 'Script'}
+                    </span>
+                    <span className="text-white font-medium">
+                        {selected?.name || 'Select Language'}
+                    </span>
                     <span className="text-slate-400 text-sm">{selected?.nativeName}</span>
                 </span>
-                <span className={`text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
+                <span className={`text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`}>
+                    ▼
+                </span>
             </button>
 
             {open && (
@@ -54,13 +61,22 @@ export default function LanguageSelector({ value, onChange }: LanguageSelectorPr
                         {filtered.map(lang => (
                             <button
                                 key={lang.code}
-                                onClick={() => { onChange(lang.code); setOpen(false); setSearch(''); }}
-                                className={`w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-orange-500/10 transition-colors ${value === lang.code ? 'bg-orange-500/20' : ''
-                                    }`}
+                                onClick={() => {
+                                    onChange(lang.code);
+                                    setOpen(false);
+                                    setSearch('');
+                                }}
+                                className={`w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-orange-500/10 transition-colors ${
+                                    value === lang.code ? 'bg-orange-500/20' : ''
+                                }`}
                             >
-                                <span className="text-orange-400 font-mono text-xs w-12">{lang.code.toUpperCase()}</span>
+                                <span className="text-orange-400 font-mono text-xs w-12">
+                                    {lang.code.toUpperCase()}
+                                </span>
                                 <span className="text-white text-sm font-medium">{lang.name}</span>
-                                <span className="text-slate-400 text-sm ml-auto">{lang.nativeName}</span>
+                                <span className="text-slate-400 text-sm ml-auto">
+                                    {lang.nativeName}
+                                </span>
                             </button>
                         ))}
                     </div>

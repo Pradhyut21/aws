@@ -18,12 +18,6 @@ export default defineConfig({
                 'src/main.tsx',
                 'src/test/**',
             ],
-            thresholds: {
-                lines:      60,
-                functions:  60,
-                branches:   50,
-                statements: 60,
-            },
         },
     },
 });

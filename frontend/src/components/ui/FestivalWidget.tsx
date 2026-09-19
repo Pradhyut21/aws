@@ -12,7 +12,11 @@ function getCountdown(dateStr: string) {
     return { days, hours, expired: false };
 }
 
-export default function FestivalWidget({ onCreateCampaign }: { onCreateCampaign?: (festival: string) => void }) {
+export default function FestivalWidget({
+    onCreateCampaign,
+}: {
+    onCreateCampaign?: (festival: string) => void;
+}) {
     const [, forceUpdate] = useState(0);
 
     useEffect(() => {
@@ -20,8 +24,7 @@ export default function FestivalWidget({ onCreateCampaign }: { onCreateCampaign?
         return () => clearInterval(timer);
     }, []);
 
-    const upcoming = UPCOMING_FESTIVALS
-        .map(f => ({ ...f, countdown: getCountdown(f.date) }))
+    const upcoming = UPCOMING_FESTIVALS.map(f => ({ ...f, countdown: getCountdown(f.date) }))
         .filter(f => !f.countdown.expired)
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
         .slice(0, 4);
@@ -50,7 +53,10 @@ export default function FestivalWidget({ onCreateCampaign }: { onCreateCampaign?
                         <div className="font-semibold text-white text-sm">{festival.name}</div>
                         <div className="text-slate-400 text-xs">{festival.description}</div>
                         <div className="mt-2 flex items-center gap-1">
-                            <span className="text-xs font-mono font-bold" style={{ color: festival.color }}>
+                            <span
+                                className="text-xs font-mono font-bold"
+                                style={{ color: festival.color }}
+                            >
                                 {festival.countdown.days}d {festival.countdown.hours}h
                             </span>
                             <span className="text-slate-500 text-xs">away</span>

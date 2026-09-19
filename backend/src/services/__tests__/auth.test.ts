@@ -26,12 +26,7 @@ jest.mock('@aws-sdk/lib-dynamodb', () => ({
     QueryCommand: jest.fn(),
 }));
 
-import {
-    hashPassword,
-    verifyPassword,
-    generateToken,
-    verifyToken,
-} from '../auth';
+import { hashPassword, verifyPassword, generateToken, verifyToken } from '../auth';
 import type { User } from '../auth';
 
 // ─── Sample user fixture ──────────────────────────────────────────────────────

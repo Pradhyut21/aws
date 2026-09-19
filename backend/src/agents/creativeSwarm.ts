@@ -9,12 +9,23 @@ interface CreativeOutput {
     whatsapp: { message: string; statusText: string };
 }
 
-export async function runCreativeSwarm(campaign: Campaign, research: object): Promise<CreativeOutput> {
+export async function runCreativeSwarm(
+    campaign: Campaign,
+    research: object
+): Promise<CreativeOutput> {
     const lang = campaign.language;
     const langMap: Record<string, string> = {
-        hi: 'Hindi', ta: 'Tamil', bn: 'Bengali', te: 'Telugu',
-        kn: 'Kannada', ml: 'Malayalam', mr: 'Marathi', gu: 'Gujarati',
-        pa: 'Punjabi', ur: 'Urdu', en: 'English'
+        hi: 'Hindi',
+        ta: 'Tamil',
+        bn: 'Bengali',
+        te: 'Telugu',
+        kn: 'Kannada',
+        ml: 'Malayalam',
+        mr: 'Marathi',
+        gu: 'Gujarati',
+        pa: 'Punjabi',
+        ur: 'Urdu',
+        en: 'English',
     };
     const langName = langMap[lang] || 'Hindi';
 
@@ -93,11 +104,23 @@ Format:
             seo: {
                 title: `Best ${campaign.businessType} in ${campaign.region[0]} — Special Offer 2026`,
                 metaDescription: `Discover authentic ${campaign.businessType} products from ${campaign.region[0]}. Free shipping, guaranteed quality.`,
-                keywords: [`${campaign.businessType} ${campaign.region[0]}`, `buy ${campaign.businessType} online`, `local ${campaign.businessType}`],
+                keywords: [
+                    `${campaign.businessType} ${campaign.region[0]}`,
+                    `buy ${campaign.businessType} online`,
+                    `local ${campaign.businessType}`,
+                ],
             },
-            hashtags: ['#MadeInIndia', '#VocalForLocal', `#${campaign.region[0]?.replace(/ /g, '')}`, '#IndianSMB', '#LocalBusiness'],
+            hashtags: [
+                '#MadeInIndia',
+                '#VocalForLocal',
+                `#${campaign.region[0]?.replace(/ /g, '')}`,
+                '#IndianSMB',
+                '#LocalBusiness',
+            ],
             whatsapp: {
-                message: captions.whatsapp || `🙏 Special offer — 30% off on all ${campaign.businessType} products!`,
+                message:
+                    captions.whatsapp ||
+                    `🙏 Special offer — 30% off on all ${campaign.businessType} products!`,
                 statusText: `✨ Special Offer! ${campaign.businessType} sale — limited time 🎁`,
             },
         };
@@ -105,10 +128,17 @@ Format:
         console.error('Creative swarm error:', error);
         // Language-aware fallback content
         const greetings: Record<string, string> = {
-            hi: 'नमस्ते! 🙏', ta: 'வணக்கம்! 🙏', te: 'నమస్కారం! 🙏',
-            kn: 'ನಮಸ್ಕಾರ! 🙏', ml: 'നമസ്കാരം! 🙏', bn: 'নমস্কার! 🙏',
-            mr: 'नमस्कार! 🙏', gu: 'નમસ્તે! 🙏', pa: 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ! 🙏',
-            ur: 'السلام علیکم! 🙏', en: 'Hello! 👋',
+            hi: 'नमस्ते! 🙏',
+            ta: 'வணக்கம்! 🙏',
+            te: 'నమస్కారం! 🙏',
+            kn: 'ನಮಸ್ಕಾರ! 🙏',
+            ml: 'നമസ്കാരം! 🙏',
+            bn: 'নমস্কার! 🙏',
+            mr: 'नमस्कार! 🙏',
+            gu: 'નમસ્તે! 🙏',
+            pa: 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ! 🙏',
+            ur: 'السلام علیکم! 🙏',
+            en: 'Hello! 👋',
         };
 
         const promoText: Record<string, string> = {
@@ -131,7 +161,7 @@ Format:
             ta: ['✅ தரம் உறுதி', '✅ வீட்டு விநியோகம்', '✅ 24/7 ஆதரவு'],
             ml: ['✅ ഗുണമേന്മ ഉറപ്പ്', '✅ ഹോം ഡെലിവറി', '✅ 24/7 പിന്തുണ'],
             kn: ['✅ ಗುಣಮಟ್ಟದ ಖಾತರಿ', '✅ ಹೋಮ್ ಡೆಲಿವರಿ', '✅ 24/7 ಬೆಂಬಲ'],
-            en: ['✅ Quality Guaranteed', '✅ Fast Delivery', '✅ 24/7 Support']
+            en: ['✅ Quality Guaranteed', '✅ Fast Delivery', '✅ 24/7 Support'],
         };
 
         const greet = greetings[lang] || greetings['en'];
@@ -143,34 +173,47 @@ Format:
         const bizSlug = biz.replace(/\s+/g, '');
 
         const inputStr = campaign.input || '';
-        const cleanWords = inputStr.toLowerCase()
+        const cleanWords = inputStr
+            .toLowerCase()
             .replace(/[^\w\s]/gi, '')
-            .replace(/\b(i|want|need|give|me|show|an|a|the|some|any|make|create|generate|ad|campaign|for|my|in|at|this|that|please|pls|do|it|and|to|with)\b/gi, '')
+            .replace(
+                /\b(i|want|need|give|me|show|an|a|the|some|any|make|create|generate|ad|campaign|for|my|in|at|this|that|please|pls|do|it|and|to|with)\b/gi,
+                ''
+            )
             .split(/\s+/)
             .filter(w => w.length > 2)
             .map(w => w.charAt(0).toUpperCase() + w.slice(1));
 
-        const spellings: Record<string, string> = { 'bulding': 'building', 'matirals': 'materials', 'dheli': 'Delhi', 'bussiness': 'business', 'mambai': 'Mumbai' };
+        const spellings: Record<string, string> = {
+            bulding: 'building',
+            matirals: 'materials',
+            dheli: 'Delhi',
+            bussiness: 'business',
+            mambai: 'Mumbai',
+        };
         const cleanWordsMapped = cleanWords.map(w => spellings[w.toLowerCase()] || w);
         // Use the exact business they described, or fallback
         const bizCategory = biz;
         // bizSlug is already declared above
 
-        const extractedBizName = cleanWordsMapped.length > 0 ? cleanWordsMapped.join(' ') : (bizCategory.charAt(0).toUpperCase() + bizCategory.slice(1));
+        const extractedBizName =
+            cleanWordsMapped.length > 0
+                ? cleanWordsMapped.join(' ')
+                : bizCategory.charAt(0).toUpperCase() + bizCategory.slice(1);
 
         const AI_HOOKS = [
             `Elevate your experience with the finest ${extractedBizName} services in ${region0}.`,
             `Your search for premium ${extractedBizName} ends here. Discover unparalleled quality!`,
             `Transforming the ${bizCategory} landscape in ${region0} with innovation and excellence.`,
             `Experience the gold standard of ${extractedBizName}. Tailored exclusively for you.`,
-            `Unlocking new possibilities in ${extractedBizName} for the people of ${region0}.`
+            `Unlocking new possibilities in ${extractedBizName} for the people of ${region0}.`,
         ];
         const synthesizedPhrase = AI_HOOKS[inputStr.length % AI_HOOKS.length];
 
         const AI_FACTS = [
             `💡 Importance of ${extractedBizName}: High-quality ${extractedBizName} significantly boosts the local economy and elevates community standards.`,
             `💡 Why it matters: ${extractedBizName} plays a crucial role in modern lifestyle improvements and essential daily operations.`,
-            `💡 The Value of ${extractedBizName}: Investing in premier ${extractedBizName} ensures long-term sustained value and outstanding market reliability.`
+            `💡 The Value of ${extractedBizName}: Investing in premier ${extractedBizName} ensures long-term sustained value and outstanding market reliability.`,
         ];
         const aiFact = AI_FACTS[inputStr.length % AI_FACTS.length];
 
@@ -206,10 +249,20 @@ Format:
                 title: `Top Rated ${extractedBizName} in ${region0} | Guaranteed Quality`,
                 metaDescription: `Looking for the best ${extractedBizName} in ${region0}? We provide elite services and products designed for your needs. Contact us today!`,
                 keywords: [
-                    `${extractedBizName}`, `${region0}`, `premium ${extractedBizName}`, `best ${extractedBizName} online`, `local ${bizCategory} shop`
+                    `${extractedBizName}`,
+                    `${region0}`,
+                    `premium ${extractedBizName}`,
+                    `best ${extractedBizName} online`,
+                    `local ${bizCategory} shop`,
                 ],
             },
-            hashtags: [`#${bizSlug}`, '#VocalForLocal', '#MadeInIndia', `#${region0.replace(/\s+/g, '')}Business`, '#IndianSMB'],
+            hashtags: [
+                `#${bizSlug}`,
+                '#VocalForLocal',
+                '#MadeInIndia',
+                `#${region0.replace(/\s+/g, '')}Business`,
+                '#IndianSMB',
+            ],
             whatsapp: {
                 message: waMessage,
                 statusText: `✨ Special Offer! ${biz} — ${region0} 🎁`,

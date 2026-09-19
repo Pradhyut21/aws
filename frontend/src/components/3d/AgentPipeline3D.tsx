@@ -18,7 +18,12 @@ const NODE_POSITIONS: [number, number, number][] = [
 
 const COLORS = ['#00D4FF', '#FF6B35', '#F7C948', '#00FF88', '#FF6B35'];
 
-function AgentNode({ position, index, isActive, isDone }: {
+function AgentNode({
+    position,
+    index,
+    isActive,
+    isDone,
+}: {
     position: [number, number, number];
     index: number;
     isActive: boolean;
@@ -67,7 +72,11 @@ function AgentNode({ position, index, isActive, isDone }: {
     );
 }
 
-function ConnectionBeam({ from, to, active }: {
+function ConnectionBeam({
+    from,
+    to,
+    active,
+}: {
     from: [number, number, number];
     to: [number, number, number];
     active: boolean;

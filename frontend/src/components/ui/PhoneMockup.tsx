@@ -7,7 +7,8 @@ export default function PhoneMockup({ children, platform = 'instagram' }: PhoneM
     return (
         <div className="relative mx-auto" style={{ width: 280 }}>
             {/* Phone frame */}
-            <div className="relative rounded-[40px] overflow-hidden shadow-2xl"
+            <div
+                className="relative rounded-[40px] overflow-hidden shadow-2xl"
                 style={{
                     background: '#1a1a2e',
                     border: '3px solid #2a2a4e',
@@ -25,7 +26,8 @@ export default function PhoneMockup({ children, platform = 'instagram' }: PhoneM
                 </div>
 
                 {/* App header */}
-                <div className="px-3 py-2 flex items-center gap-2"
+                <div
+                    className="px-3 py-2 flex items-center gap-2"
                     style={{ background: platform === 'whatsapp' ? '#075E54' : '#000' }}
                 >
                     {platform === 'instagram' ? (

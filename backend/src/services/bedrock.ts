@@ -1,5 +1,5 @@
-import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../lib/logger';
 import { BedrockError } from '../lib/errors';
@@ -31,9 +31,9 @@ const client = new BedrockRuntimeClient({ region: process.env.AWS_REGION || 'us-
  *       }]
  *     }'
  */
-const S3_BUCKET  = process.env.S3_BUCKET_NAME   || 'bharatmedia-images-dev';
-const S3_REGION  = process.env.AWS_REGION        || 'us-east-1';
-const s3Client   = new S3Client({ region: S3_REGION });
+const S3_BUCKET = process.env.S3_BUCKET_NAME || 'bharatmedia-images-dev';
+const S3_REGION = process.env.AWS_REGION || 'us-east-1';
+const s3Client = new S3Client({ region: S3_REGION });
 
 // Helper function to invoke Claude (always available)
 async function invokeClaude(prompt: string, maxTokens: number = 2000): Promise<string> {
@@ -87,7 +87,10 @@ export async function invokeNovaPro(prompt: string, maxTokens: number = 2000): P
         return responseBody.output.message.content[0].text;
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
-        logger.warn('Nova Pro unavailable — falling back to Claude', { modelId: MODEL_ID, error: message });
+        logger.warn('Nova Pro unavailable — falling back to Claude', {
+            modelId: MODEL_ID,
+            error: message,
+        });
         return await invokeClaude(prompt, maxTokens);
     }
 }
@@ -116,7 +119,10 @@ export async function invokeNovaOmni(prompt: string, maxTokens: number = 1500): 
         return responseBody.output.message.content[0].text;
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
-        logger.warn('Nova Omni unavailable — falling back to Claude', { modelId: MODEL_ID, error: message });
+        logger.warn('Nova Omni unavailable — falling back to Claude', {
+            modelId: MODEL_ID,
+            error: message,
+        });
         return await invokeClaude(prompt, maxTokens);
     }
 }
@@ -171,17 +177,21 @@ export async function invokeNovaSonic(prompt: string, maxTokens: number = 500): 
  * @param height  Height in pixels (default 1024)
  * @returns       Public S3 URL: https://<bucket>.s3.<region>.amazonaws.com/campaigns/<year>/<month>/<uuid>.png
  */
-export async function generateTitanImage(prompt: string, width: number = 1024, height: number = 1024): Promise<string> {
+export async function generateTitanImage(
+    prompt: string,
+    width: number = 1024,
+    height: number = 1024
+): Promise<string> {
     logger.info('Generating image with Titan Image Generator', { width, height });
     const payload = {
-        taskType: "TEXT_IMAGE",
+        taskType: 'TEXT_IMAGE',
         textToImageParams: {
             text: prompt,
-            negativeText: "blurry, low quality, distorted, ugly",
+            negativeText: 'blurry, low quality, distorted, ugly',
         },
         imageGenerationConfig: {
             numberOfImages: 1,
-            quality: "standard",
+            quality: 'standard',
             cfgScale: 8.0,
             height,
             width,
@@ -190,9 +200,9 @@ export async function generateTitanImage(prompt: string, width: number = 1024, h
     };
 
     const command = new InvokeModelCommand({
-        modelId: "amazon.titan-image-generator-v1",
-        contentType: "application/json",
-        accept: "application/json",
+        modelId: 'amazon.titan-image-generator-v1',
+        contentType: 'application/json',
+        accept: 'application/json',
         body: JSON.stringify(payload),
     });
 

@@ -53,10 +53,17 @@ export function useVoiceRecorder() {
             mediaRecorderRef.current = recorder;
             chunksRef.current = [];
 
-            recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+            recorder.ondataavailable = e => {
+                if (e.data.size > 0) chunksRef.current.push(e.data);
+            };
             recorder.onstop = () => {
                 const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
-                setState(prev => ({ ...prev, audioBlob: blob, isRecording: false, waveformData: new Array(40).fill(4) }));
+                setState(prev => ({
+                    ...prev,
+                    audioBlob: blob,
+                    isRecording: false,
+                    waveformData: new Array(40).fill(4),
+                }));
             };
 
             recorder.start();
@@ -71,7 +78,10 @@ export function useVoiceRecorder() {
 
             setState(prev => ({ ...prev, isRecording: true, error: null, duration: 0 }));
         } catch {
-            setState(prev => ({ ...prev, error: 'Microphone access denied. Please allow microphone.' }));
+            setState(prev => ({
+                ...prev,
+                error: 'Microphone access denied. Please allow microphone.',
+            }));
         }
     }, [animateWaveform]);
 
@@ -86,7 +96,13 @@ export function useVoiceRecorder() {
 
     const reset = useCallback(() => {
         stop();
-        setState({ isRecording: false, audioBlob: null, waveformData: new Array(40).fill(4), duration: 0, error: null });
+        setState({
+            isRecording: false,
+            audioBlob: null,
+            waveformData: new Array(40).fill(4),
+            duration: 0,
+            error: null,
+        });
     }, [stop]);
 
     return { ...state, start, stop, reset };

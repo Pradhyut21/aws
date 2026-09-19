@@ -9,22 +9,22 @@ interface PipelineState {
     isComplete: boolean;
     isAborted: boolean;
     campaignData: unknown;
-    contentHash: string | null;   // GatedCart-inspired integrity fingerprint
+    contentHash: string | null; // GatedCart-inspired integrity fingerprint
     error: string | null;
 }
 
 export function useCampaignPipeline(campaignId: string | null) {
     const [state, setState] = useState<PipelineState>({
-        stages:       PIPELINE_STAGES.map(s => ({ ...s, status: 'waiting', detail: '' })),
+        stages: PIPELINE_STAGES.map(s => ({ ...s, status: 'waiting', detail: '' })),
         currentStage: 0,
-        isComplete:   false,
-        isAborted:    false,
+        isComplete: false,
+        isAborted: false,
         campaignData: null,
-        contentHash:  null,
-        error:        null,
+        contentHash: null,
+        error: null,
     });
 
-    const wsRef  = useRef<WebSocket | null>(null);
+    const wsRef = useRef<WebSocket | null>(null);
     const sseRef = useRef<EventSource | null>(null);
 
     // ── Message handler (shared by WS + SSE) ────────────────────────────────
@@ -34,17 +34,20 @@ export function useCampaignPipeline(campaignId: string | null) {
                 ...prev,
                 currentStage: msg.stage,
                 stages: prev.stages.map(s =>
-                    s.id === msg.stage ? { ...s, status: msg.status, detail: msg.detail } :
-                        s.id < msg.stage ? { ...s, status: 'done' } : s
+                    s.id === msg.stage
+                        ? { ...s, status: msg.status, detail: msg.detail }
+                        : s.id < msg.stage
+                          ? { ...s, status: 'done' }
+                          : s
                 ),
             }));
         } else if (msg.type === 'done') {
             setState(prev => ({
                 ...prev,
-                isComplete:   true,
+                isComplete: true,
                 campaignData: msg.data,
-                contentHash:  (msg.data as any)?.contentHash ?? null,
-                stages:       prev.stages.map(s => ({ ...s, status: 'done' })),
+                contentHash: (msg.data as any)?.contentHash ?? null,
+                stages: prev.stages.map(s => ({ ...s, status: 'done' })),
             }));
             wsRef.current?.close();
             sseRef.current?.close();
@@ -59,10 +62,11 @@ export function useCampaignPipeline(campaignId: string | null) {
             const c = (msg as any).campaign;
             if (c?.status === 'done') {
                 setState(prev => ({
-                    ...prev, isComplete: true,
+                    ...prev,
+                    isComplete: true,
                     campaignData: c.content,
-                    contentHash:  c.contentHash ?? null,
-                    stages:       prev.stages.map(s => ({ ...s, status: 'done' })),
+                    contentHash: c.contentHash ?? null,
+                    stages: prev.stages.map(s => ({ ...s, status: 'done' })),
                 }));
             }
         }
@@ -71,19 +75,25 @@ export function useCampaignPipeline(campaignId: string | null) {
     // ── SSE fallback (Veritas-inspired) ──────────────────────────────────────
     const connectSSE = useCallback(() => {
         if (!campaignId) return;
-        const apiBase = (import.meta.env.VITE_API_URL || `http://${window.location.hostname}:4000/api`)
-            .replace('/api', '');
+        const apiBase = (
+            import.meta.env.VITE_API_URL || `http://${window.location.hostname}:4000/api`
+        ).replace('/api', '');
         const token = localStorage.getItem('authToken') ?? '';
-        const es = new EventSource(`${apiBase}/api/campaign/${campaignId}/stream?token=${encodeURIComponent(token)}`);
+        const es = new EventSource(
+            `${apiBase}/api/campaign/${campaignId}/stream?token=${encodeURIComponent(token)}`
+        );
         sseRef.current = es;
-        es.onmessage = (e) => {
+        es.onmessage = e => {
             try {
                 handleMsg(JSON.parse(e.data));
             } catch {
                 /* ignore malformed SSE messages */
             }
         };
-        es.onerror   = () => { es.close(); setState(prev => ({ ...prev, error: 'Stream connection lost' })); };
+        es.onerror = () => {
+            es.close();
+            setState(prev => ({ ...prev, error: 'Stream connection lost' }));
+        };
     }, [campaignId, handleMsg]);
 
     // ── WebSocket connect ─────────────────────────────────────────────────────
@@ -92,14 +102,14 @@ export function useCampaignPipeline(campaignId: string | null) {
         const wsBase = import.meta.env.VITE_WS_URL || `ws://${window.location.hostname}:4000`;
         const ws = new WebSocket(`${wsBase}/ws?campaignId=${campaignId}`);
         wsRef.current = ws;
-        ws.onmessage = (e) => {
+        ws.onmessage = e => {
             try {
                 handleMsg(JSON.parse(e.data));
             } catch {
                 /* ignore malformed WS messages */
             }
         };
-        ws.onerror   = () => {
+        ws.onerror = () => {
             // WS failed — fall back to SSE
             console.warn('[Pipeline] WS error, switching to SSE');
             ws.close();
@@ -132,7 +142,8 @@ export function useCampaignPipeline(campaignId: string | null) {
         setState(prev => ({
             ...prev,
             stages: stages.map(s => ({ ...s, status: 'waiting', detail: '' })),
-            currentStage: 0, isComplete: false,
+            currentStage: 0,
+            isComplete: false,
         }));
         const details = [
             'Analysing handicraft trends in UP… Found 3 viral formats this week',
@@ -142,17 +153,30 @@ export function useCampaignPipeline(campaignId: string | null) {
             'Content published to 4 platforms! Estimated reach: 24K',
         ];
         const interval = setInterval(() => {
-            if (step >= stages.length) { clearInterval(interval); setState(prev => ({ ...prev, isComplete: true })); return; }
+            if (step >= stages.length) {
+                clearInterval(interval);
+                setState(prev => ({ ...prev, isComplete: true }));
+                return;
+            }
             const s = stages[step];
             setState(prev => ({
-                ...prev, currentStage: s.id,
+                ...prev,
+                currentStage: s.id,
                 stages: prev.stages.map(ps =>
-                    ps.id === s.id ? { ...ps, status: 'running', detail: details[step] } :
-                        ps.id < s.id ? { ...ps, status: 'done' } : ps
+                    ps.id === s.id
+                        ? { ...ps, status: 'running', detail: details[step] }
+                        : ps.id < s.id
+                          ? { ...ps, status: 'done' }
+                          : ps
                 ),
             }));
             setTimeout(() => {
-                setState(prev => ({ ...prev, stages: prev.stages.map(ps => ps.id === s.id ? { ...ps, status: 'done' } : ps) }));
+                setState(prev => ({
+                    ...prev,
+                    stages: prev.stages.map(ps =>
+                        ps.id === s.id ? { ...ps, status: 'done' } : ps
+                    ),
+                }));
             }, 1400);
             step++;
         }, 1800);

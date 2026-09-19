@@ -12,7 +12,16 @@ interface PricingCardProps {
     badge?: string;
 }
 
-export default function PricingCard({ tier, price, period, features, cta, highlighted, emoji, badge }: PricingCardProps) {
+export default function PricingCard({
+    tier,
+    price,
+    period,
+    features,
+    cta,
+    highlighted,
+    emoji,
+    badge,
+}: PricingCardProps) {
     const rotateX = useMotionValue(0);
     const rotateY = useMotionValue(0);
     const springRotateX = useSpring(rotateX, { stiffness: 150, damping: 20 });
@@ -28,7 +37,10 @@ export default function PricingCard({ tier, price, period, features, cta, highli
         rotateY.set((x - centerX) / 15);
     };
 
-    const handleLeave = () => { rotateX.set(0); rotateY.set(0); };
+    const handleLeave = () => {
+        rotateX.set(0);
+        rotateY.set(0);
+    };
 
     return (
         <motion.div
@@ -36,27 +48,34 @@ export default function PricingCard({ tier, price, period, features, cta, highli
             onMouseMove={handleMouse}
             onMouseLeave={handleLeave}
             whileHover={{ y: -8 }}
-            className={`relative glass-card p-6 flex flex-col cursor-default transition-all duration-300 ${highlighted ? 'border-orange-500/50 shadow-2xl shadow-orange-900/30' : ''
-                }`}
+            className={`relative glass-card p-6 flex flex-col cursor-default transition-all duration-300 ${
+                highlighted ? 'border-orange-500/50 shadow-2xl shadow-orange-900/30' : ''
+            }`}
         >
             {badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="px-4 py-1 rounded-full text-xs font-bold font-poppins text-black animate-pulse-glow"
-                        style={{ background: 'linear-gradient(135deg, #FF6B35, #F7C948)' }}>
+                    <span
+                        className="px-4 py-1 rounded-full text-xs font-bold font-poppins text-black animate-pulse-glow"
+                        style={{ background: 'linear-gradient(135deg, #FF6B35, #F7C948)' }}
+                    >
                         {badge}
                     </span>
                 </div>
             )}
 
             {highlighted && (
-                <div className="absolute inset-0 rounded-2xl opacity-5"
-                    style={{ background: 'linear-gradient(135deg, #FF6B35, #F7C948)' }} />
+                <div
+                    className="absolute inset-0 rounded-2xl opacity-5"
+                    style={{ background: 'linear-gradient(135deg, #FF6B35, #F7C948)' }}
+                />
             )}
 
             <div className="text-4xl mb-3">{emoji}</div>
             <h3 className="text-xl font-bold font-poppins text-white mb-1">{tier}</h3>
             <div className="flex items-end gap-1 mb-1">
-                <span className={`text-4xl font-black font-poppins ${highlighted ? 'gradient-text' : 'text-white'}`}>
+                <span
+                    className={`text-4xl font-black font-poppins ${highlighted ? 'gradient-text' : 'text-white'}`}
+                >
                     {price}
                 </span>
                 {period && <span className="text-slate-400 text-sm mb-1">/{period}</span>}

@@ -4,7 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import { ShortcutsHelpTooltip } from '../../hooks/useKeyboardShortcuts.tsx';
 import SettingsModal from '../ui/SettingsModal';
 
-const NAV_SECTIONS: { label: string; items: { path: string; icon: string; label: string; shortcut?: string }[] }[] = [
+const NAV_SECTIONS: {
+    label: string;
+    items: { path: string; icon: string; label: string; shortcut?: string }[];
+}[] = [
     {
         label: 'Main',
         items: [
@@ -53,9 +56,7 @@ const NAV_SECTIONS: { label: string; items: { path: string; icon: string; label:
     },
     {
         label: 'Innovation',
-        items: [
-            { path: '/ideas', icon: '🇮🇳', label: 'Ideas Hub', shortcut: 'I' },
-        ],
+        items: [{ path: '/ideas', icon: '🇮🇳', label: 'Ideas Hub', shortcut: 'I' }],
     },
 ];
 
@@ -74,7 +75,7 @@ export default function Sidebar({ collapsed: defaultCollapsed = false }: Sidebar
     const [settingsTab, setSettingsTab] = useState<'account' | 'billing'>('account');
 
     // User Session Mock
-    const [user, setUser] = useState<{ name: string, email: string, avatar: string } | null>(null);
+    const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(null);
     useEffect(() => {
         try {
             const stored = localStorage.getItem('bm_user');
@@ -103,10 +104,16 @@ export default function Sidebar({ collapsed: defaultCollapsed = false }: Sidebar
             <div className="px-4 py-2 mb-4">
                 <AnimatePresence>
                     {!collapsed ? (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                            className="flex items-center gap-2">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="flex items-center gap-2"
+                        >
                             <span className="text-xl">🇮🇳</span>
-                            <span className="font-black font-poppins gradient-text text-sm">BharatMedia</span>
+                            <span className="font-black font-poppins gradient-text text-sm">
+                                BharatMedia
+                            </span>
                         </motion.div>
                     ) : (
                         <span className="text-xl">🇮🇳</span>
@@ -119,7 +126,9 @@ export default function Sidebar({ collapsed: defaultCollapsed = false }: Sidebar
                 {NAV_SECTIONS.map(section => (
                     <div key={section.label} className="mb-3">
                         {!collapsed && (
-                            <p className="text-[10px] font-mono text-slate-600 uppercase tracking-widest px-3 mb-1">{section.label}</p>
+                            <p className="text-[10px] font-mono text-slate-600 uppercase tracking-widest px-3 mb-1">
+                                {section.label}
+                            </p>
                         )}
                         {section.items.map(item => {
                             const isActive = location.pathname === item.path;
@@ -127,8 +136,11 @@ export default function Sidebar({ collapsed: defaultCollapsed = false }: Sidebar
                                 <Link
                                     key={item.path}
                                     to={item.path}
-                                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${isActive ? 'bg-orange-500/20 text-orange-400' : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                        }`}
+                                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${
+                                        isActive
+                                            ? 'bg-orange-500/20 text-orange-400'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                    }`}
                                 >
                                     <span className="text-lg flex-shrink-0">{item.icon}</span>
                                     <AnimatePresence>
@@ -139,7 +151,9 @@ export default function Sidebar({ collapsed: defaultCollapsed = false }: Sidebar
                                                 exit={{ opacity: 0, width: 0 }}
                                                 className="flex items-center justify-between flex-1 overflow-hidden"
                                             >
-                                                <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>
+                                                <span className="text-sm font-medium whitespace-nowrap">
+                                                    {item.label}
+                                                </span>
                                                 {item.shortcut && (
                                                     <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/6 text-slate-600 border border-white/8 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         {item.shortcut}
@@ -168,8 +182,10 @@ export default function Sidebar({ collapsed: defaultCollapsed = false }: Sidebar
             {/* Collapse toggle + shortcuts */}
             <div className="px-2 space-y-1">
                 {!collapsed && (
-                    <button onClick={() => setShowShortcuts(s => !s)}
-                        className="w-full p-2 rounded-xl text-slate-500 hover:text-slate-300 text-xs text-left hover:bg-white/4 transition-all flex items-center gap-2">
+                    <button
+                        onClick={() => setShowShortcuts(s => !s)}
+                        className="w-full p-2 rounded-xl text-slate-500 hover:text-slate-300 text-xs text-left hover:bg-white/4 transition-all flex items-center gap-2"
+                    >
                         ⌨️ Keyboard Shortcuts
                     </button>
                 )}
@@ -189,11 +205,19 @@ export default function Sidebar({ collapsed: defaultCollapsed = false }: Sidebar
                             onClick={() => setShowProfileMenu(!showProfileMenu)}
                             className={`w-full flex items-center gap-3 p-2 rounded-xl transition-all ${showProfileMenu ? 'bg-white/10' : 'hover:bg-white/5'}`}
                         >
-                            <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full bg-slate-800 border border-white/10" />
+                            <img
+                                src={user.avatar}
+                                alt="Avatar"
+                                className="w-8 h-8 rounded-full bg-slate-800 border border-white/10"
+                            />
                             {!collapsed && (
                                 <div className="flex-1 text-left min-w-0">
-                                    <p className="text-sm font-semibold text-white truncate">{user.name}</p>
-                                    <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
+                                    <p className="text-sm font-semibold text-white truncate">
+                                        {user.name}
+                                    </p>
+                                    <p className="text-[10px] text-slate-400 truncate">
+                                        {user.email}
+                                    </p>
                                 </div>
                             )}
                             {!collapsed && <span className="text-slate-500 text-xs">⚙️</span>}
@@ -208,23 +232,38 @@ export default function Sidebar({ collapsed: defaultCollapsed = false }: Sidebar
                                     className="absolute bottom-[calc(100%+8px)] left-3 right-3 glass-card py-2 border border-white/10 shadow-xl overflow-hidden"
                                 >
                                     <div className="px-3 pb-2 mb-2 border-b border-white/5">
-                                        <p className="text-xs font-semibold text-white">{user.name}</p>
-                                        <p className="text-[10px] text-slate-400">Pro Plan (Trial)</p>
+                                        <p className="text-xs font-semibold text-white">
+                                            {user.name}
+                                        </p>
+                                        <p className="text-[10px] text-slate-400">
+                                            Pro Plan (Trial)
+                                        </p>
                                     </div>
                                     <button
-                                        onClick={() => { setSettingsTab('account'); setIsSettingsOpen(true); setShowProfileMenu(false); }}
+                                        onClick={() => {
+                                            setSettingsTab('account');
+                                            setIsSettingsOpen(true);
+                                            setShowProfileMenu(false);
+                                        }}
                                         className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
                                     >
                                         <span>🧑‍💻</span> Account Settings
                                     </button>
                                     <button
-                                        onClick={() => { setSettingsTab('billing'); setIsSettingsOpen(true); setShowProfileMenu(false); }}
+                                        onClick={() => {
+                                            setSettingsTab('billing');
+                                            setIsSettingsOpen(true);
+                                            setShowProfileMenu(false);
+                                        }}
                                         className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
                                     >
                                         <span>💳</span> Billing & Plan
                                     </button>
                                     <div className="h-[1px] bg-white/5 my-1" />
-                                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-2">
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-2"
+                                    >
                                         <span>🚪</span> Log out
                                     </button>
                                 </motion.div>
@@ -232,7 +271,10 @@ export default function Sidebar({ collapsed: defaultCollapsed = false }: Sidebar
                         </AnimatePresence>
                     </>
                 ) : (
-                    <Link to="/login" className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-orange-500 text-white font-semibold text-sm hover:scale-[1.02] transition-transform">
+                    <Link
+                        to="/login"
+                        className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-orange-500 text-white font-semibold text-sm hover:scale-[1.02] transition-transform"
+                    >
                         <span>👋</span> {!collapsed ? 'Log In' : ''}
                     </Link>
                 )}

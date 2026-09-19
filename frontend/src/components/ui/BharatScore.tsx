@@ -8,8 +8,16 @@ interface BharatScoreProps {
     platformOptimization: number;
 }
 
-function CircleProgress({ value, max = 25, label, color }: {
-    value: number; max?: number; label: string; color: string;
+function CircleProgress({
+    value,
+    max = 25,
+    label,
+    color,
+}: {
+    value: number;
+    max?: number;
+    label: string;
+    color: string;
 }) {
     const radius = 32;
     const circumference = 2 * Math.PI * radius;
@@ -19,9 +27,18 @@ function CircleProgress({ value, max = 25, label, color }: {
         <div className="flex flex-col items-center gap-2">
             <div className="relative w-20 h-20">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
-                    <circle cx="40" cy="40" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
+                    <circle
+                        cx="40"
+                        cy="40"
+                        r={radius}
+                        fill="none"
+                        stroke="rgba(255,255,255,0.08)"
+                        strokeWidth="6"
+                    />
                     <motion.circle
-                        cx="40" cy="40" r={radius}
+                        cx="40"
+                        cy="40"
+                        r={radius}
                         fill="none"
                         stroke={color}
                         strokeWidth="6"
@@ -33,7 +50,9 @@ function CircleProgress({ value, max = 25, label, color }: {
                     />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-lg font-bold font-poppins" style={{ color }}>{value}</span>
+                    <span className="text-lg font-bold font-poppins" style={{ color }}>
+                        {value}
+                    </span>
                 </div>
             </div>
             <span className="text-xs text-slate-400 text-center leading-tight">{label}</span>
@@ -41,7 +60,13 @@ function CircleProgress({ value, max = 25, label, color }: {
     );
 }
 
-export default function BharatScore({ total, culturalFit, seoScore, engagementPotential, platformOptimization }: BharatScoreProps) {
+export default function BharatScore({
+    total,
+    culturalFit,
+    seoScore,
+    engagementPotential,
+    platformOptimization,
+}: BharatScoreProps) {
     return (
         <div className="glass-card p-6 text-center">
             <h3 className="text-lg font-bold font-poppins gradient-text mb-2">BharatScore™</h3>
@@ -51,9 +76,18 @@ export default function BharatScore({ total, culturalFit, seoScore, engagementPo
             <div className="flex justify-center mb-6">
                 <div className="relative w-32 h-32">
                     <svg className="w-full h-full -rotate-90" viewBox="0 0 128 128">
-                        <circle cx="64" cy="64" r="56" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8" />
+                        <circle
+                            cx="64"
+                            cy="64"
+                            r="56"
+                            fill="none"
+                            stroke="rgba(255,255,255,0.06)"
+                            strokeWidth="8"
+                        />
                         <motion.circle
-                            cx="64" cy="64" r="56"
+                            cx="64"
+                            cy="64"
+                            r="56"
                             fill="none"
                             stroke="url(#scoreGrad)"
                             strokeWidth="8"

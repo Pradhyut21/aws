@@ -17,23 +17,35 @@ const AVATAR_COLORS: Record<string, { bg: string; text: string }> = {
     grace: { bg: '#00D4FF', text: '#0A0F1E' },
 };
 
-export default function TestimonialCard({ name, business, city, language, quote, quoteEn, rating, avatar }: TestimonialProps) {
+export default function TestimonialCard({
+    name,
+    business,
+    city,
+    language,
+    quote,
+    quoteEn,
+    rating,
+    avatar,
+}: TestimonialProps) {
     const colors = AVATAR_COLORS[avatar] || { bg: '#FF6B35', text: '#fff' };
 
     return (
-        <motion.div
-            className="glass-card p-6 feature-card"
-            whileHover={{ y: -4, scale: 1.02 }}
-        >
+        <motion.div className="glass-card p-6 feature-card" whileHover={{ y: -4, scale: 1.02 }}>
             {/* Stars */}
             <div className="flex gap-1 mb-4">
-                {Array(rating).fill(0).map((_, i) => (
-                    <span key={i} className="text-yellow-400">★</span>
-                ))}
+                {Array(rating)
+                    .fill(0)
+                    .map((_, i) => (
+                        <span key={i} className="text-yellow-400">
+                            ★
+                        </span>
+                    ))}
             </div>
 
             {/* Quote */}
-            <blockquote className="text-slate-200 text-sm leading-relaxed mb-2">"{quote}"</blockquote>
+            <blockquote className="text-slate-200 text-sm leading-relaxed mb-2">
+                "{quote}"
+            </blockquote>
             <p className="text-slate-500 text-xs italic mb-4">"{quoteEn}"</p>
 
             {/* Author */}
@@ -46,7 +58,9 @@ export default function TestimonialCard({ name, business, city, language, quote,
                 </div>
                 <div>
                     <p className="text-white font-semibold text-sm">{name}</p>
-                    <p className="text-slate-400 text-xs">{business} · {city}</p>
+                    <p className="text-slate-400 text-xs">
+                        {business} · {city}
+                    </p>
                     <p className="text-orange-400/70 text-xs">Speaks {language}</p>
                 </div>
             </div>

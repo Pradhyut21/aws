@@ -45,12 +45,24 @@ import {
 } from './services/v3store';
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { PollyClient, SynthesizeSpeechCommand, Engine, OutputFormat, TextType, VoiceId } from '@aws-sdk/client-polly';
+import {
+    PollyClient,
+    SynthesizeSpeechCommand,
+    Engine,
+    OutputFormat,
+    TextType,
+    VoiceId,
+} from '@aws-sdk/client-polly';
 import { TranslateClient, TranslateTextCommand } from '@aws-sdk/client-translate';
-import { ComprehendClient, DetectSentimentCommand, DetectKeyPhrasesCommand, LanguageCode } from '@aws-sdk/client-comprehend';
+import {
+    ComprehendClient,
+    DetectSentimentCommand,
+    DetectKeyPhrasesCommand,
+    LanguageCode,
+} from '@aws-sdk/client-comprehend';
 import { RekognitionClient, DetectModerationLabelsCommand } from '@aws-sdk/client-rekognition';
 import crypto from 'crypto';
-import { runPersonaSwarm }   from './agents/personaSwarm';
+import { runPersonaSwarm } from './agents/personaSwarm';
 import { getPersonaReview, seedPersonas } from './services/personaStore';
 import multer from 'multer';
 import { transcribeAudioBuffer, LANG_DISPLAY_NAMES } from './services/transcribe';
@@ -88,19 +100,23 @@ const campaignClients = new Map<string, Set<WebSocket>>();
 // ─── SECURITY MIDDLEWARE ───────────────────────────────────────────────────
 
 // CORS with whitelist
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:5173').split(',');
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('CORS not allowed'));
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+const allowedOrigins = (
+    process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:5173'
+).split(',');
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('CORS not allowed'));
+            }
+        },
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    })
+);
 
 app.use(express.json({ limit: '50mb' }));
 
@@ -142,7 +158,9 @@ function broadcast(campaignId: string, data: object) {
     const clients = campaignClients.get(campaignId);
     if (!clients) return;
     const msg = JSON.stringify(data);
-    clients.forEach(ws => { if (ws.readyState === WebSocket.OPEN) ws.send(msg); });
+    clients.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) ws.send(msg);
+    });
 }
 
 // ─── WebSocket keepalive — prevents silent drops on slow Bedrock calls ───────
@@ -151,7 +169,10 @@ function broadcast(campaignId: string, data: object) {
 const WS_PING_INTERVAL = 30_000;
 const heartbeat = setInterval(() => {
     wss.clients.forEach((ws: any) => {
-        if (ws.isAlive === false) { ws.terminate(); return; }
+        if (ws.isAlive === false) {
+            ws.terminate();
+            return;
+        }
         ws.isAlive = false;
         ws.ping();
     });
@@ -161,7 +182,9 @@ wss.on('close', () => clearInterval(heartbeat));
 // WebSocket connection handler
 wss.on('connection', (ws: any, req) => {
     ws.isAlive = true;
-    ws.on('pong', () => { ws.isAlive = true; });
+    ws.on('pong', () => {
+        ws.isAlive = true;
+    });
 
     try {
         const url = new URL(req.url || '', `ws://localhost`);
@@ -189,11 +212,14 @@ wss.on('connection', (ws: any, req) => {
 // ─── AUTH ROUTES ───────────────────────────────────────────────────────────
 
 // POST /api/auth/signup
-app.post('/api/auth/signup',
+app.post(
+    '/api/auth/signup',
     body('email').isEmail().normalizeEmail(),
     body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
     body('name').trim().notEmpty().withMessage('Name is required'),
-    body('language').optional().isIn(['hi', 'en', 'ta', 'te', 'kn', 'ml', 'mr', 'gu', 'bn', 'pa', 'or']),
+    body('language')
+        .optional()
+        .isIn(['hi', 'en', 'ta', 'te', 'kn', 'ml', 'mr', 'gu', 'bn', 'pa', 'or']),
     body('businessType').optional().trim(),
     body('region').optional().isArray(),
     handleValidationErrors,
@@ -207,19 +233,39 @@ app.post('/api/auth/signup',
             }
 
             // Create user with FREE tier activated
-            const user = await createUser(email, password, name, language || 'hi', businessType || 'other', region || []);
+            const user = await createUser(
+                email,
+                password,
+                name,
+                language || 'hi',
+                businessType || 'other',
+                region || []
+            );
             const token = generateToken(user);
 
             // Auto-login response (no login needed)
             res.status(201).json({
                 user,
                 token,
-                message: 'Welcome to BharatMedia! Your FREE tier is activated. Start creating campaigns now!',
+                message:
+                    'Welcome to BharatMedia! Your FREE tier is activated. Start creating campaigns now!',
                 tier: 'free',
                 features: {
-                    free: ['5 campaigns/month', '3 languages', 'Instagram + WhatsApp', 'Basic analytics'],
-                    pro: ['Unlimited campaigns', '22 languages', 'All 15 platforms', 'AI Video (Nova Reel)', 'Smart scheduling', 'BharatScore analytics']
-                }
+                    free: [
+                        '5 campaigns/month',
+                        '3 languages',
+                        'Instagram + WhatsApp',
+                        'Basic analytics',
+                    ],
+                    pro: [
+                        'Unlimited campaigns',
+                        '22 languages',
+                        'All 15 platforms',
+                        'AI Video (Nova Reel)',
+                        'Smart scheduling',
+                        'BharatScore analytics',
+                    ],
+                },
             });
         } catch (error: any) {
             console.error('Signup error:', error);
@@ -229,7 +275,8 @@ app.post('/api/auth/signup',
 );
 
 // POST /api/auth/login
-app.post('/api/auth/login',
+app.post(
+    '/api/auth/login',
     body('email').isEmail().normalizeEmail(),
     body('password').notEmpty(),
     handleValidationErrors,
@@ -271,10 +318,13 @@ app.get('/api/auth/me', authMiddleware, async (req: AuthRequest, res: Response) 
 });
 
 // PUT /api/auth/profile
-app.put('/api/auth/profile',
+app.put(
+    '/api/auth/profile',
     authMiddleware,
     body('name').optional().trim().notEmpty(),
-    body('language').optional().isIn(['hi', 'en', 'ta', 'te', 'kn', 'ml', 'mr', 'gu', 'bn', 'pa', 'or']),
+    body('language')
+        .optional()
+        .isIn(['hi', 'en', 'ta', 'te', 'kn', 'ml', 'mr', 'gu', 'bn', 'pa', 'or']),
     body('businessType').optional().trim(),
     body('region').optional().isArray(),
     handleValidationErrors,
@@ -294,7 +344,8 @@ app.put('/api/auth/profile',
 // ─── CAMPAIGN ROUTES ───────────────────────────────────────────────────────
 
 // POST /api/campaign/create
-app.post('/api/campaign/create',
+app.post(
+    '/api/campaign/create',
     authMiddleware,
     body('input').trim().notEmpty().withMessage('Input is required'),
     body('inputType').isIn(['text', 'voice', 'image']),
@@ -304,7 +355,8 @@ app.post('/api/campaign/create',
     handleValidationErrors,
     async (req: AuthRequest, res: Response) => {
         try {
-            const { input, inputType, language, businessType, region, scheduledFor, templateId } = req.body;
+            const { input, inputType, language, businessType, region, scheduledFor, templateId } =
+                req.body;
 
             const campaign = await createCampaign(req.userId!, {
                 input,
@@ -318,7 +370,7 @@ app.post('/api/campaign/create',
             });
 
             // Start async pipeline (fire-and-forget — do NOT await)
-            runPipeline(campaign.id, campaign as any, (event) => broadcast(campaign.id, event));
+            runPipeline(campaign.id, campaign as any, event => broadcast(campaign.id, event));
 
             res.json({ campaignId: campaign.id, wsChannel: `/ws?campaignId=${campaign.id}` });
         } catch (error: any) {
@@ -329,7 +381,8 @@ app.post('/api/campaign/create',
 );
 
 // GET /api/campaign/:id
-app.get('/api/campaign/:id',
+app.get(
+    '/api/campaign/:id',
     param('id').notEmpty(),
     handleValidationErrors,
     optionalAuthMiddleware,
@@ -352,21 +405,19 @@ app.get('/api/campaign/:id',
 );
 
 // GET /api/campaigns
-app.get('/api/campaigns',
-    authMiddleware,
-    async (req: AuthRequest, res: Response) => {
-        try {
-            const userCampaigns = await getUserCampaigns(req.userId!);
-            res.json(userCampaigns);
-        } catch (error: any) {
-            console.error('Get campaigns error:', error);
-            res.status(500).json({ error: 'Failed to get campaigns', message: error.message });
-        }
+app.get('/api/campaigns', authMiddleware, async (req: AuthRequest, res: Response) => {
+    try {
+        const userCampaigns = await getUserCampaigns(req.userId!);
+        res.json(userCampaigns);
+    } catch (error: any) {
+        console.error('Get campaigns error:', error);
+        res.status(500).json({ error: 'Failed to get campaigns', message: error.message });
     }
-);
+});
 
 // POST /api/campaign/:id/publish
-app.post('/api/campaign/:id/publish',
+app.post(
+    '/api/campaign/:id/publish',
     authMiddleware,
     param('id').notEmpty(),
     body('platforms').isArray().notEmpty(),
@@ -375,7 +426,8 @@ app.post('/api/campaign/:id/publish',
         try {
             const campaign = await getCampaign(req.params.id);
             if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
-            if (campaign.userId !== req.userId) return res.status(403).json({ error: 'Unauthorized' });
+            if (campaign.userId !== req.userId)
+                return res.status(403).json({ error: 'Unauthorized' });
 
             const { platforms } = req.body;
             await updateCampaign(campaign.id, {
@@ -383,7 +435,11 @@ app.post('/api/campaign/:id/publish',
                 publishedAt: new Date().toISOString(),
             });
 
-            res.json({ success: true, platforms, message: `Published to ${platforms.length} platforms!` });
+            res.json({
+                success: true,
+                platforms,
+                message: `Published to ${platforms.length} platforms!`,
+            });
         } catch (error: any) {
             console.error('Publish campaign error:', error);
             res.status(500).json({ error: 'Failed to publish campaign', message: error.message });
@@ -392,7 +448,8 @@ app.post('/api/campaign/:id/publish',
 );
 
 // DELETE /api/campaign/:id
-app.delete('/api/campaign/:id',
+app.delete(
+    '/api/campaign/:id',
     authMiddleware,
     param('id').notEmpty(),
     handleValidationErrors,
@@ -400,7 +457,8 @@ app.delete('/api/campaign/:id',
         try {
             const campaign = await getCampaign(req.params.id);
             if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
-            if (campaign.userId !== req.userId) return res.status(403).json({ error: 'Unauthorized' });
+            if (campaign.userId !== req.userId)
+                return res.status(403).json({ error: 'Unauthorized' });
 
             await deleteCampaign(campaign.id);
             res.json({ success: true });
@@ -414,12 +472,15 @@ app.delete('/api/campaign/:id',
 // ─── TEMPLATE ROUTES ───────────────────────────────────────────────────────
 
 // POST /api/templates
-app.post('/api/templates',
+app.post(
+    '/api/templates',
     authMiddleware,
     body('name').trim().notEmpty(),
     body('description').optional().trim(),
     body('businessType').optional().trim(),
-    body('language').optional().isIn(['hi', 'en', 'ta', 'te', 'kn', 'ml', 'mr', 'gu', 'bn', 'pa', 'or']),
+    body('language')
+        .optional()
+        .isIn(['hi', 'en', 'ta', 'te', 'kn', 'ml', 'mr', 'gu', 'bn', 'pa', 'or']),
     body('content').notEmpty(),
     body('isPublic').optional().isBoolean(),
     handleValidationErrors,
@@ -445,18 +506,15 @@ app.post('/api/templates',
 );
 
 // GET /api/templates
-app.get('/api/templates',
-    authMiddleware,
-    async (req: AuthRequest, res: Response) => {
-        try {
-            const userTemplates = await getUserTemplates(req.userId!);
-            res.json(userTemplates);
-        } catch (error: any) {
-            console.error('Get templates error:', error);
-            res.status(500).json({ error: 'Failed to get templates', message: error.message });
-        }
+app.get('/api/templates', authMiddleware, async (req: AuthRequest, res: Response) => {
+    try {
+        const userTemplates = await getUserTemplates(req.userId!);
+        res.json(userTemplates);
+    } catch (error: any) {
+        console.error('Get templates error:', error);
+        res.status(500).json({ error: 'Failed to get templates', message: error.message });
     }
-);
+});
 
 // GET /api/templates/public
 app.get('/api/templates/public', async (_req: Request, res: Response) => {
@@ -472,18 +530,15 @@ app.get('/api/templates/public', async (_req: Request, res: Response) => {
 // ─── ANALYTICS ROUTES ──────────────────────────────────────────────────────
 
 // GET /api/analytics
-app.get('/api/analytics',
-    authMiddleware,
-    async (req: AuthRequest, res: Response) => {
-        try {
-            const userAnalytics = await getOrCreateAnalytics(req.userId!);
-            res.json(userAnalytics);
-        } catch (error: any) {
-            console.error('Get analytics error:', error);
-            res.status(500).json({ error: 'Failed to get analytics', message: error.message });
-        }
+app.get('/api/analytics', authMiddleware, async (req: AuthRequest, res: Response) => {
+    try {
+        const userAnalytics = await getOrCreateAnalytics(req.userId!);
+        res.json(userAnalytics);
+    } catch (error: any) {
+        console.error('Get analytics error:', error);
+        res.status(500).json({ error: 'Failed to get analytics', message: error.message });
     }
-);
+});
 
 // POST /api/voice/transcribe
 // ─────────────────────────────────────────────────────────────────────────────
@@ -499,7 +554,8 @@ app.get('/api/analytics',
 // Supported: hi-IN, en-IN, ta-IN, te-IN, kn-IN, ml-IN, mr-IN
 // Fallback: if Transcribe is unavailable, returns labeled DEMO response
 // ─────────────────────────────────────────────────────────────────────────────
-app.post('/api/voice/transcribe',
+app.post(
+    '/api/voice/transcribe',
     authMiddleware,
     audioUpload.single('audio'),
     async (req: AuthRequest, res: Response) => {
@@ -514,7 +570,9 @@ app.post('/api/voice/transcribe',
             });
         }
 
-        console.log(`🎙️ [Transcribe] Received ${req.file.size} bytes (${req.file.mimetype}), language: ${language}`);
+        console.log(
+            `🎙️ [Transcribe] Received ${req.file.size} bytes (${req.file.mimetype}), language: ${language}`
+        );
 
         try {
             // ── Real Amazon Transcribe Streaming call ────────────────────
@@ -523,7 +581,8 @@ app.post('/api/voice/transcribe',
             if (!result.transcription) {
                 // Transcribe returned empty (silence / very short clip) — use demo
                 return res.json({
-                    transcription: 'Mera naam Raju hai, main Varanasi mein silk sarees bechta hoon. Mujhe Diwali ke liye ek campaign chahiye jo Instagram aur WhatsApp par Hindi mein ho.',
+                    transcription:
+                        'Mera naam Raju hai, main Varanasi mein silk sarees bechta hoon. Mujhe Diwali ke liye ek campaign chahiye jo Instagram aur WhatsApp par Hindi mein ho.',
                     detectedLanguage: language,
                     languageName: langName,
                     confidence: 0.97,
@@ -534,20 +593,21 @@ app.post('/api/voice/transcribe',
             }
 
             res.json(result);
-
         } catch (error: any) {
             console.error('[Transcribe] Error:', error.message);
 
             // ── Graceful fallback — labeled as DEMO so UI is transparent ─
             res.json({
-                transcription: 'Mera naam Raju hai, main Varanasi mein silk sarees bechta hoon. Mujhe Diwali ke liye ek campaign chahiye jo Instagram aur WhatsApp par Hindi mein ho.',
+                transcription:
+                    'Mera naam Raju hai, main Varanasi mein silk sarees bechta hoon. Mujhe Diwali ke liye ek campaign chahiye jo Instagram aur WhatsApp par Hindi mein ho.',
                 detectedLanguage: language,
                 languageName: langName,
                 confidence: 0.97,
                 source: 'DEMO_FALLBACK',
                 note: `Amazon Transcribe unavailable (${error.message?.slice(0, 80) ?? 'unknown error'}) — showing demo transcript. Check IAM permissions: transcribe:StartStreamTranscription`,
                 service: 'Amazon Transcribe Streaming',
-                upgradeRequired: 'Ensure IAM role has transcribe:StartStreamTranscription permission',
+                upgradeRequired:
+                    'Ensure IAM role has transcribe:StartStreamTranscription permission',
             });
         }
     }
@@ -572,14 +632,14 @@ app.get('/api/pricing', (_req: Request, res: Response) => {
                         'Instagram + WhatsApp',
                         'Basic analytics',
                         'Standard images',
-                        'Email support'
+                        'Email support',
                     ],
                     limitations: [
                         'Limited to 2 platforms',
                         'No video generation',
                         'No scheduling',
-                        'No influencer matching'
-                    ]
+                        'No influencer matching',
+                    ],
                 },
                 {
                     name: 'Pro',
@@ -598,9 +658,9 @@ app.get('/api/pricing', (_req: Request, res: Response) => {
                         'Festival campaigns',
                         'Influencer matching',
                         'Priority support',
-                        'API access'
+                        'API access',
                     ],
-                    savings: 'Save ₹1,188/year vs monthly'
+                    savings: 'Save ₹1,188/year vs monthly',
                 },
                 {
                     name: 'Enterprise',
@@ -618,10 +678,10 @@ app.get('/api/pricing', (_req: Request, res: Response) => {
                         'Multi-user team',
                         'Custom integrations',
                         '24/7 support',
-                        'Advanced analytics'
-                    ]
-                }
-            ]
+                        'Advanced analytics',
+                    ],
+                },
+            ],
         });
     } catch (error: any) {
         console.error('Get pricing error:', error);
@@ -630,7 +690,8 @@ app.get('/api/pricing', (_req: Request, res: Response) => {
 });
 
 // POST /api/upgrade
-app.post('/api/upgrade',
+app.post(
+    '/api/upgrade',
     authMiddleware,
     body('tier').isIn(['free', 'pro', 'enterprise']),
     handleValidationErrors,
@@ -645,7 +706,10 @@ app.post('/api/upgrade',
                 success: true,
                 message: `Upgraded to ${tier} tier!`,
                 user,
-                nextSteps: tier === 'pro' ? 'Payment link will be sent to your email' : 'Our team will contact you soon'
+                nextSteps:
+                    tier === 'pro'
+                        ? 'Payment link will be sent to your email'
+                        : 'Our team will contact you soon',
             });
         } catch (error: any) {
             console.error('Upgrade error:', error);
@@ -657,7 +721,8 @@ app.post('/api/upgrade',
 // ─── V3 AGENT TRACE ROUTES ────────────────────────────────────────────────
 
 // GET /api/campaign/:id/trace
-app.get('/api/campaign/:id/trace',
+app.get(
+    '/api/campaign/:id/trace',
     authMiddleware,
     param('id').notEmpty(),
     handleValidationErrors,
@@ -665,7 +730,8 @@ app.get('/api/campaign/:id/trace',
         try {
             const campaign = await getCampaign(req.params.id);
             if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
-            if (campaign.userId !== req.userId) return res.status(403).json({ error: 'Unauthorized' });
+            if (campaign.userId !== req.userId)
+                return res.status(403).json({ error: 'Unauthorized' });
             const trace = await getCampaignTrace(req.params.id);
             res.json(trace);
         } catch (error: any) {
@@ -677,20 +743,18 @@ app.get('/api/campaign/:id/trace',
 // ─── V3 EXPERIMENT ROUTES ─────────────────────────────────────────────────
 
 // GET /api/experiments
-app.get('/api/experiments',
-    authMiddleware,
-    async (req: AuthRequest, res: Response) => {
-        try {
-            const experiments = await getUserExperiments(req.userId!);
-            res.json(experiments);
-        } catch (error: any) {
-            res.status(500).json({ error: 'Failed to get experiments', message: error.message });
-        }
+app.get('/api/experiments', authMiddleware, async (req: AuthRequest, res: Response) => {
+    try {
+        const experiments = await getUserExperiments(req.userId!);
+        res.json(experiments);
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to get experiments', message: error.message });
     }
-);
+});
 
 // GET /api/experiments/:id
-app.get('/api/experiments/:id',
+app.get(
+    '/api/experiments/:id',
     authMiddleware,
     param('id').notEmpty(),
     handleValidationErrors,
@@ -707,7 +771,8 @@ app.get('/api/experiments/:id',
 );
 
 // PATCH /api/experiments/:id/metrics  — update variant metrics
-app.patch('/api/experiments/:id/metrics',
+app.patch(
+    '/api/experiments/:id/metrics',
     authMiddleware,
     param('id').notEmpty(),
     body('variantId').notEmpty(),
@@ -735,25 +800,31 @@ app.patch('/api/experiments/:id/metrics',
 // ─── V3 LEARNING MEMORY ROUTES ────────────────────────────────────────────
 
 // GET /api/learning
-app.get('/api/learning',
-    authMiddleware,
-    async (req: AuthRequest, res: Response) => {
-        try {
-            const lessons = await getUserLessons(req.userId!, 20);
-            res.json(lessons);
-        } catch (error: any) {
-            res.status(500).json({ error: 'Failed to get learning data', message: error.message });
-        }
+app.get('/api/learning', authMiddleware, async (req: AuthRequest, res: Response) => {
+    try {
+        const lessons = await getUserLessons(req.userId!, 20);
+        res.json(lessons);
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to get learning data', message: error.message });
     }
-);
+});
 
 // ─── V3 BHARATBRAIN ROUTES ────────────────────────────────────────────────
 
 // POST /api/brain/upload — upload a brand document to S3 + register in DynamoDB
-app.post('/api/brain/upload',
+app.post(
+    '/api/brain/upload',
     authMiddleware,
     body('name').trim().notEmpty(),
-    body('type').isIn(['brand_guidelines', 'product_catalog', 'persona', 'previous_campaign', 'reviews', 'competitor', 'other']),
+    body('type').isIn([
+        'brand_guidelines',
+        'product_catalog',
+        'persona',
+        'previous_campaign',
+        'reviews',
+        'competitor',
+        'other',
+    ]),
     body('content').notEmpty().withMessage('File content (base64) required'),
     body('mimeType').optional().isString(),
     handleValidationErrors,
@@ -761,15 +832,17 @@ app.post('/api/brain/upload',
         try {
             const { name, type, content, mimeType = 'text/plain' } = req.body;
             const buffer = Buffer.from(content, 'base64');
-            const docId  = crypto.randomUUID();
-            const s3Key  = `brain/${req.userId!}/${docId}-${name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+            const docId = crypto.randomUUID();
+            const s3Key = `brain/${req.userId!}/${docId}-${name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
 
-            await s3.send(new PutObjectCommand({
-                Bucket:      S3_BUCKET,
-                Key:         s3Key,
-                Body:        buffer,
-                ContentType: mimeType,
-            }));
+            await s3.send(
+                new PutObjectCommand({
+                    Bucket: S3_BUCKET,
+                    Key: s3Key,
+                    Body: buffer,
+                    ContentType: mimeType,
+                })
+            );
 
             const doc = await saveBrainDoc(req.userId!, {
                 name,
@@ -787,20 +860,18 @@ app.post('/api/brain/upload',
 );
 
 // GET /api/brain
-app.get('/api/brain',
-    authMiddleware,
-    async (req: AuthRequest, res: Response) => {
-        try {
-            const docs = await getUserBrainDocs(req.userId!);
-            res.json(docs);
-        } catch (error: any) {
-            res.status(500).json({ error: 'Failed to get documents', message: error.message });
-        }
+app.get('/api/brain', authMiddleware, async (req: AuthRequest, res: Response) => {
+    try {
+        const docs = await getUserBrainDocs(req.userId!);
+        res.json(docs);
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to get documents', message: error.message });
     }
-);
+});
 
 // DELETE /api/brain/:id
-app.delete('/api/brain/:id',
+app.delete(
+    '/api/brain/:id',
     authMiddleware,
     param('id').notEmpty(),
     handleValidationErrors,
@@ -826,8 +897,9 @@ const MARKET_SIGNALS = [
     { topic: 'Discount-only campaigns', change: '-12%', trend: 'down', region: 'Pan India' },
 ];
 
-app.get('/api/market-pulse',
-    optionalAuthMiddleware,   // ← changed: unauthenticated users can see demo signals
+app.get(
+    '/api/market-pulse',
+    optionalAuthMiddleware, // ← changed: unauthenticated users can see demo signals
     async (_req: AuthRequest, res: Response) => {
         // ⚠️ SIMULATED — labels every item as demo data
         const signals = MARKET_SIGNALS.map(s => ({
@@ -836,13 +908,19 @@ app.get('/api/market-pulse',
             note: 'Demo data — connect to a real social listening provider in production',
             timestamp: new Date().toISOString(),
         }));
-        res.json({ signals, source: 'SIMULATED', disclaimer: 'These signals are demo data for hackathon demonstration. Not real-time social data.' });
+        res.json({
+            signals,
+            source: 'SIMULATED',
+            disclaimer:
+                'These signals are demo data for hackathon demonstration. Not real-time social data.',
+        });
     }
 );
 
 // ─── V3 CAMPAIGN SIMULATOR ROUTE ──────────────────────────────────────────
 
-app.post('/api/campaign/simulate',
+app.post(
+    '/api/campaign/simulate',
     authMiddleware,
     body('businessType').notEmpty(),
     body('region').isArray(),
@@ -855,23 +933,34 @@ app.post('/api/campaign/simulate',
 
             // Model-informed estimates based on region + business type
             const regionMultipliers: Record<string, number> = {
-                Mumbai: 1.8, Delhi: 1.9, Bengaluru: 1.6, Hyderabad: 1.4,
-                Chennai: 1.3, Kolkata: 1.2, Jaipur: 0.9, Varanasi: 0.7,
+                Mumbai: 1.8,
+                Delhi: 1.9,
+                Bengaluru: 1.6,
+                Hyderabad: 1.4,
+                Chennai: 1.3,
+                Kolkata: 1.2,
+                Jaipur: 0.9,
+                Varanasi: 0.7,
             };
             const regionKey = region[0] || '';
             const multiplier = regionMultipliers[regionKey] ?? 1.0;
-            const baseReach  = Math.round(18000 * multiplier);
+            const baseReach = Math.round(18000 * multiplier);
 
             res.json({
                 source: 'MODEL_ESTIMATE',
-                disclaimer: 'These are model-based estimates, not guarantees. Actual performance depends on many factors.',
+                disclaimer:
+                    'These are model-based estimates, not guarantees. Actual performance depends on many factors.',
                 estimates: {
-                    audienceSize:    Math.round(baseReach * 2.2),
-                    estimatedReach:  { min: Math.round(baseReach * 0.9), max: Math.round(baseReach * 1.3) },
-                    estimatedCtr:    { min: 1.8, max: 3.4 },
-                    engagement:      { min: 3.2, max: 5.8 },
-                    bestTime:        platform === 'instagram' ? '7:00 PM IST' : '12:00 PM IST',
-                    languageBonus:   language !== 'en' ? '+18% predicted CTR for regional language' : null,
+                    audienceSize: Math.round(baseReach * 2.2),
+                    estimatedReach: {
+                        min: Math.round(baseReach * 0.9),
+                        max: Math.round(baseReach * 1.3),
+                    },
+                    estimatedCtr: { min: 1.8, max: 3.4 },
+                    engagement: { min: 3.2, max: 5.8 },
+                    bestTime: platform === 'instagram' ? '7:00 PM IST' : '12:00 PM IST',
+                    languageBonus:
+                        language !== 'en' ? '+18% predicted CTR for regional language' : null,
                 },
                 suggestions: [
                     'Add a time-bound offer (e.g., "valid this weekend") to improve CTR',
@@ -889,107 +978,123 @@ app.post('/api/campaign/simulate',
 // POST /api/campaign/:id/abort
 // Sets campaign status to 'aborted' immediately — useful if Bedrock is slow
 // during a demo or if the user wants to kill the run.
-app.post('/api/campaign/:id/abort',
-    authMiddleware,
-    async (req: AuthRequest, res: Response) => {
-        try {
-            const campaign = await getCampaign(req.params.id);
-            if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
-            if (campaign.userId !== req.userId) return res.status(403).json({ error: 'Forbidden' });
-            await updateCampaign(req.params.id, { status: 'aborted' });
-            broadcast(req.params.id, { type: 'abort', campaignId: req.params.id, timestamp: new Date().toISOString() });
-            res.json({ campaignId: req.params.id, status: 'aborted', message: 'Campaign aborted' });
-        } catch (error: any) {
-            res.status(500).json({ error: 'Abort failed', message: error.message });
-        }
+app.post('/api/campaign/:id/abort', authMiddleware, async (req: AuthRequest, res: Response) => {
+    try {
+        const campaign = await getCampaign(req.params.id);
+        if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
+        if (campaign.userId !== req.userId) return res.status(403).json({ error: 'Forbidden' });
+        await updateCampaign(req.params.id, { status: 'aborted' });
+        broadcast(req.params.id, {
+            type: 'abort',
+            campaignId: req.params.id,
+            timestamp: new Date().toISOString(),
+        });
+        res.json({ campaignId: req.params.id, status: 'aborted', message: 'Campaign aborted' });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Abort failed', message: error.message });
     }
-);
+});
 
 // ─── SSE STREAMING ENDPOINT (Veritas-inspired) ────────────────────────────
 // GET /api/campaign/:id/stream
 // Server-Sent Events alternative to WebSocket — more reliable on App Runner
 // and through proxies that don't support WebSocket header upgrades.
 // The frontend hooks into this automatically if WebSocket fails.
-app.get('/api/campaign/:id/stream',
-    async (req: Request, res: Response) => {
-        const campaignId = req.params.id;
-        res.setHeader('Content-Type',  'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection',    'keep-alive');
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.flushHeaders();
+app.get('/api/campaign/:id/stream', async (req: Request, res: Response) => {
+    const campaignId = req.params.id;
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.flushHeaders();
 
-        // Send existing campaign state immediately
-        try {
-            const campaign = await getCampaign(campaignId);
-            if (campaign) {
-                res.write(`data: ${JSON.stringify({ type: 'state', campaign })}\n\n`);
-                if (campaign.status === 'done' || campaign.status === 'error' || campaign.status === 'aborted') {
-                    res.end();
-                    return;
-                }
+    // Send existing campaign state immediately
+    try {
+        const campaign = await getCampaign(campaignId);
+        if (campaign) {
+            res.write(`data: ${JSON.stringify({ type: 'state', campaign })}\n\n`);
+            if (
+                campaign.status === 'done' ||
+                campaign.status === 'error' ||
+                campaign.status === 'aborted'
+            ) {
+                res.end();
+                return;
             }
-        } catch { /* campaign not found yet, stay open */ }
-
-        // Relay WebSocket broadcast events to this SSE client
-        const relay = (event: object) => {
-            const data = JSON.stringify(event);
-            if (data.includes(`"campaignId":"${campaignId}"`) || data.includes(`"type":"broadcast"`)) {
-                res.write(`data: ${data}\n\n`);
-                const parsed = event as any;
-                if (parsed.type === 'done' || parsed.type === 'error' || parsed.type === 'abort') {
-                    res.end();
-                }
-            }
-        };
-
-        // Register relay — import sseClients map to forward broadcasts
-        (res as any)._sseRelay = relay;
-        if (!(app as any)._sseClients) (app as any)._sseClients = new Map();
-        const clients: Map<string, typeof relay> = (app as any)._sseClients;
-        clients.set(campaignId + ':' + Date.now(), relay);
-
-        req.on('close', () => {
-            clients.forEach((v, k) => { if (v === relay) clients.delete(k); });
-        });
-
-        // Keep-alive ping every 15s
-        const ping = setInterval(() => { try { res.write(':ping\n\n'); } catch { clearInterval(ping); } }, 15000);
-        req.on('close', () => clearInterval(ping));
+        }
+    } catch {
+        /* campaign not found yet, stay open */
     }
-);
+
+    // Relay WebSocket broadcast events to this SSE client
+    const relay = (event: object) => {
+        const data = JSON.stringify(event);
+        if (data.includes(`"campaignId":"${campaignId}"`) || data.includes(`"type":"broadcast"`)) {
+            res.write(`data: ${data}\n\n`);
+            const parsed = event as any;
+            if (parsed.type === 'done' || parsed.type === 'error' || parsed.type === 'abort') {
+                res.end();
+            }
+        }
+    };
+
+    // Register relay — import sseClients map to forward broadcasts
+    (res as any)._sseRelay = relay;
+    if (!(app as any)._sseClients) (app as any)._sseClients = new Map();
+    const clients: Map<string, typeof relay> = (app as any)._sseClients;
+    clients.set(campaignId + ':' + Date.now(), relay);
+
+    req.on('close', () => {
+        clients.forEach((v, k) => {
+            if (v === relay) clients.delete(k);
+        });
+    });
+
+    // Keep-alive ping every 15s
+    const ping = setInterval(() => {
+        try {
+            res.write(':ping\n\n');
+        } catch {
+            clearInterval(ping);
+        }
+    }, 15000);
+    req.on('close', () => clearInterval(ping));
+});
 
 // ─── AUDIT LOG (Socmint-Shield-inspired) ──────────────────────────────────
 // GET /api/audit
 // Shows the 50 most recent agent trace steps across ALL campaigns.
 // Gives judges evidence of real system activity without needing a campaign ID.
-app.get('/api/audit',
-    authMiddleware,
-    async (_req: AuthRequest, res: Response) => {
-        try {
-            const { scanRecentTraces } = await import('./services/v3store');
-            const traces = await scanRecentTraces(50);
-            res.json({
-                count: traces.length,
-                traces,
-                note: 'Most recent 50 agent trace steps across all campaigns — live from DynamoDB',
-            });
-        } catch (error: any) {
-            res.status(500).json({ error: 'Audit log unavailable', message: error.message });
-        }
+app.get('/api/audit', authMiddleware, async (_req: AuthRequest, res: Response) => {
+    try {
+        const { scanRecentTraces } = await import('./services/v3store');
+        const traces = await scanRecentTraces(50);
+        res.json({
+            count: traces.length,
+            traces,
+            note: 'Most recent 50 agent trace steps across all campaigns — live from DynamoDB',
+        });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Audit log unavailable', message: error.message });
     }
-);
+});
 
 // Health check (App Runner pings this)
 app.get('/health', (_req: Request, res: Response) => {
-    res.json({ status: 'ok', service: 'BharatMedia API', version: '3.1.0', timestamp: new Date().toISOString() });
+    res.json({
+        status: 'ok',
+        service: 'BharatMedia API',
+        version: '3.1.0',
+        timestamp: new Date().toISOString(),
+    });
 });
 
 // ─── IMAGE GENERATION ENDPOINT ─────────────────────────────────────────────
 // POST /api/generate-image
 // Calls Titan Image Generator → uploads to S3 → returns public URL.
 // Falls back to themed Unsplash/Picsum if Bedrock unavailable.
-app.post('/api/generate-image',
+app.post(
+    '/api/generate-image',
     optionalAuthMiddleware,
     body('prompt').trim().notEmpty().withMessage('Prompt is required'),
     body('businessType').optional().trim(),
@@ -1000,7 +1105,8 @@ app.post('/api/generate-image',
         const { generateTitanImage } = await import('./services/bedrock');
 
         // Build a richer, India-specific image prompt
-        const enrichedPrompt = `${prompt}. Style: vibrant, modern Indian aesthetic, professional product photography, warm colours, ` +
+        const enrichedPrompt =
+            `${prompt}. Style: vibrant, modern Indian aesthetic, professional product photography, warm colours, ` +
             `cultural context of ${region}, suitable for ${businessType} marketing. High quality, no text overlays.`;
 
         try {
@@ -1031,9 +1137,9 @@ app.post('/api/generate-image',
 // POST /api/voice/synthesize
 // Converts text to speech using Amazon Polly, stores in S3, returns presigned URL.
 const POLLY_VOICES: Record<string, VoiceId> = {
-    hi: 'Aditi',      // Hindi
-    en: 'Kajal',      // Indian English
-    ta: 'Aditi',      // Tamil — Polly doesn't have native Tamil; use Aditi
+    hi: 'Aditi', // Hindi
+    en: 'Kajal', // Indian English
+    ta: 'Aditi', // Tamil — Polly doesn't have native Tamil; use Aditi
     te: 'Aditi',
     kn: 'Aditi',
     mr: 'Aditi',
@@ -1043,7 +1149,8 @@ const POLLY_VOICES: Record<string, VoiceId> = {
     ml: 'Aditi',
 };
 
-app.post('/api/voice/synthesize',
+app.post(
+    '/api/voice/synthesize',
     optionalAuthMiddleware,
     body('text').trim().notEmpty().isLength({ max: 1500 }),
     body('language').optional().isIn(['hi', 'en', 'ta', 'te', 'kn', 'ml', 'mr', 'gu', 'bn', 'pa']),
@@ -1075,16 +1182,22 @@ app.post('/api/voice/synthesize',
 
             // Upload to S3
             const s3Key = `voice/${Date.now()}-${voiceId}.mp3`;
-            await s3.send(new PutObjectCommand({
-                Bucket: S3_BUCKET,
-                Key: s3Key,
-                Body: audioBuffer,
-                ContentType: 'audio/mpeg',
-                CacheControl: 'max-age=86400',
-            }));
+            await s3.send(
+                new PutObjectCommand({
+                    Bucket: S3_BUCKET,
+                    Key: s3Key,
+                    Body: audioBuffer,
+                    ContentType: 'audio/mpeg',
+                    CacheControl: 'max-age=86400',
+                })
+            );
 
             // Generate presigned URL (1 hour expiry)
-            const signedUrl = await getSignedUrl(s3, new GetObjectCommand({ Bucket: S3_BUCKET, Key: s3Key }), { expiresIn: 3600 });
+            const signedUrl = await getSignedUrl(
+                s3,
+                new GetObjectCommand({ Bucket: S3_BUCKET, Key: s3Key }),
+                { expiresIn: 3600 }
+            );
 
             res.json({
                 audioUrl: signedUrl,
@@ -1109,7 +1222,8 @@ app.post('/api/voice/synthesize',
 // Translates campaign copy into multiple Indian languages using Amazon Translate.
 const TRANSLATE_LANGS = ['hi', 'ta', 'te', 'kn', 'ml', 'mr', 'bn', 'gu', 'pa'];
 
-app.post('/api/translate',
+app.post(
+    '/api/translate',
     optionalAuthMiddleware,
     body('text').trim().notEmpty().isLength({ max: 5000 }),
     body('sourceLang').optional().isString(),
@@ -1133,7 +1247,7 @@ app.post('/api/translate',
             );
 
             const translations: Record<string, string> = {};
-            results.forEach((r) => {
+            results.forEach(r => {
                 if (r.status === 'fulfilled') {
                     translations[r.value.lang] = r.value.text;
                 }
@@ -1156,7 +1270,8 @@ app.post('/api/translate',
 // ─── AMAZON COMPREHEND ENDPOINT ─────────────────────────────────────────────
 // POST /api/analyze
 // Runs sentiment + key phrase detection on campaign copy.
-app.post('/api/analyze',
+app.post(
+    '/api/analyze',
     optionalAuthMiddleware,
     body('text').trim().notEmpty().isLength({ max: 5000 }),
     body('language').optional().isString(),
@@ -1168,14 +1283,18 @@ app.post('/api/analyze',
 
         try {
             const [sentimentRes, keyPhraseRes] = await Promise.all([
-                comprehendClient.send(new DetectSentimentCommand({
-                    Text: text.slice(0, 5000),
-                    LanguageCode: comprehendLang,
-                })),
-                comprehendClient.send(new DetectKeyPhrasesCommand({
-                    Text: text.slice(0, 5000),
-                    LanguageCode: comprehendLang,
-                })),
+                comprehendClient.send(
+                    new DetectSentimentCommand({
+                        Text: text.slice(0, 5000),
+                        LanguageCode: comprehendLang,
+                    })
+                ),
+                comprehendClient.send(
+                    new DetectKeyPhrasesCommand({
+                        Text: text.slice(0, 5000),
+                        LanguageCode: comprehendLang,
+                    })
+                ),
             ]);
 
             const topPhrases = (keyPhraseRes.KeyPhrases || [])
@@ -1205,7 +1324,8 @@ app.post('/api/analyze',
 // Checks a base64-encoded image for unsafe content using Rekognition DetectModerationLabels.
 // Returns a structured result with moderation categories and confidence scores.
 // Used by: SensitivityMatrix "🖼️ Image Safety" row.
-app.post('/api/image/moderate',
+app.post(
+    '/api/image/moderate',
     optionalAuthMiddleware,
     body('imageBase64').notEmpty().withMessage('imageBase64 is required'),
     body('minConfidence').optional().isFloat({ min: 0, max: 100 }),
@@ -1248,9 +1368,8 @@ app.post('/api/image/moderate',
             }));
 
             const safe = flagged.length === 0;
-            const maxConfidence = flagged.length > 0
-                ? Math.max(...flagged.map(f => f.confidence))
-                : 100;
+            const maxConfidence =
+                flagged.length > 0 ? Math.max(...flagged.map(f => f.confidence)) : 100;
 
             res.json({
                 safe,
@@ -1278,7 +1397,8 @@ app.post('/api/image/moderate',
 // POST /api/campaign/:id/persona-review
 // Triggers the BharatPersonaSwarm — 20 Indian personas review the campaign in parallel.
 // Returns 202 immediately; client polls GET for the result.
-app.post('/api/campaign/:id/persona-review',
+app.post(
+    '/api/campaign/:id/persona-review',
     authMiddleware,
     async (req: AuthRequest, res: Response) => {
         try {
@@ -1286,7 +1406,9 @@ app.post('/api/campaign/:id/persona-review',
             if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
             if (campaign.userId !== req.userId) return res.status(403).json({ error: 'Forbidden' });
             if (campaign.status !== 'done') {
-                return res.status(400).json({ error: 'Campaign must be complete before persona review' });
+                return res
+                    .status(400)
+                    .json({ error: 'Campaign must be complete before persona review' });
             }
 
             // Check if review already exists
@@ -1300,7 +1422,10 @@ app.post('/api/campaign/:id/persona-review',
                 content?.videoScript || '',
                 content?.hashtags?.join(' ') || '',
                 campaign.input || '',
-            ].filter(Boolean).join('\n\n').slice(0, 3000);
+            ]
+                .filter(Boolean)
+                .join('\n\n')
+                .slice(0, 3000);
 
             // Run swarm async — respond 202 immediately
             const targetPersonaIds = req.body?.personaIds; // optional subset
@@ -1313,28 +1438,38 @@ app.post('/api/campaign/:id/persona-review',
             });
 
             // Fire and forget — saves result to DynamoDB
-            runPersonaSwarm({ campaignId: req.params.id, campaignContent, targetPersonaIds })
-                .catch(err => console.error('[PersonaSwarm] Error:', err.message));
-
+            runPersonaSwarm({ campaignId: req.params.id, campaignContent, targetPersonaIds }).catch(
+                err => console.error('[PersonaSwarm] Error:', err.message)
+            );
         } catch (error: any) {
-            res.status(500).json({ error: 'Persona review failed to start', message: error.message });
+            res.status(500).json({
+                error: 'Persona review failed to start',
+                message: error.message,
+            });
         }
     }
 );
 
 // GET /api/campaign/:id/persona-review
 // Poll for persona review result. Returns 202 if still processing, 200 when done.
-app.get('/api/campaign/:id/persona-review',
+app.get(
+    '/api/campaign/:id/persona-review',
     authMiddleware,
     async (req: AuthRequest, res: Response) => {
         try {
             const result = await getPersonaReview(req.params.id);
             if (!result) {
-                return res.status(202).json({ status: 'processing', message: 'Persona review in progress — poll again in 5s' });
+                return res.status(202).json({
+                    status: 'processing',
+                    message: 'Persona review in progress — poll again in 5s',
+                });
             }
             res.json(result);
         } catch (error: any) {
-            res.status(500).json({ error: 'Failed to fetch persona review', message: error.message });
+            res.status(500).json({
+                error: 'Failed to fetch persona review',
+                message: error.message,
+            });
         }
     }
 );
@@ -1345,8 +1480,8 @@ const PORT = process.env.PORT || 4000;
 // ⚠️ If AWS credentials are missing/invalid, log a warning but still start the server
 // so the frontend can connect and get meaningful error messages instead of ERR_CONNECTION_REFUSED.
 createTableIfNotExists()
-    .then(() => seedPersonas())   // seed 20 Indian personas after table is ready
-    .catch((err) => {
+    .then(() => seedPersonas()) // seed 20 Indian personas after table is ready
+    .catch(err => {
         console.warn(`\n⚠️  DynamoDB init failed (${err.message})`);
         console.warn('   Running in DEGRADED mode — AWS features unavailable.');
         logger.warn('DynamoDB table not reachable — check AWS credentials', {});
@@ -1361,6 +1496,5 @@ createTableIfNotExists()
             });
         });
     });
-
 
 export { app, broadcast };

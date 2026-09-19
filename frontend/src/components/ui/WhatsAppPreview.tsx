@@ -6,14 +6,21 @@ interface WhatsAppPreviewProps {
     time?: string;
 }
 
-export default function WhatsAppPreview({ message, businessName, time = '3:07 PM' }: WhatsAppPreviewProps) {
+export default function WhatsAppPreview({
+    message,
+    businessName,
+    time = '3:07 PM',
+}: WhatsAppPreviewProps) {
     return (
         <div className="bg-[#0d1f16] h-full p-3 space-y-3">
             {/* Wallpaper dots */}
-            <div className="absolute inset-0 opacity-5" style={{
-                backgroundImage: 'radial-gradient(circle, #25D366 1px, transparent 1px)',
-                backgroundSize: '24px 24px',
-            }} />
+            <div
+                className="absolute inset-0 opacity-5"
+                style={{
+                    backgroundImage: 'radial-gradient(circle, #25D366 1px, transparent 1px)',
+                    backgroundSize: '24px 24px',
+                }}
+            />
 
             {/* Incoming header */}
             <div className="flex items-center gap-2 relative z-10">
@@ -34,7 +41,9 @@ export default function WhatsAppPreview({ message, businessName, time = '3:07 PM
                 className="relative ml-2"
             >
                 <div className="bg-[#1e3a2a] rounded-tr-2xl rounded-br-2xl rounded-bl-2xl px-3 py-2 max-w-[240px] shadow-lg">
-                    <p className="text-[#F5F5F5] text-sm whitespace-pre-line leading-relaxed">{message}</p>
+                    <p className="text-[#F5F5F5] text-sm whitespace-pre-line leading-relaxed">
+                        {message}
+                    </p>
                     <div className="flex items-center justify-end gap-1 mt-1">
                         <span className="text-[10px] text-green-400/60">{time}</span>
                         <span className="text-green-400 text-[10px]">✓✓</span>
