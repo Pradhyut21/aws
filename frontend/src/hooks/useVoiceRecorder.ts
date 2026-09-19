@@ -37,6 +37,15 @@ export function useVoiceRecorder() {
         animFrameRef.current = requestAnimationFrame(animateWaveform);
     }, []);
 
+    const stop = useCallback(() => {
+        if (mediaRecorderRef.current?.state === 'recording') {
+            mediaRecorderRef.current.stop();
+        }
+        streamRef.current?.getTracks().forEach(t => t.stop());
+        cancelAnimationFrame(animFrameRef.current);
+        if (timerRef.current) clearInterval(timerRef.current);
+    }, []);
+
     const start = useCallback(async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -83,16 +92,7 @@ export function useVoiceRecorder() {
                 error: 'Microphone access denied. Please allow microphone.',
             }));
         }
-    }, [animateWaveform]);
-
-    const stop = useCallback(() => {
-        if (mediaRecorderRef.current?.state === 'recording') {
-            mediaRecorderRef.current.stop();
-        }
-        streamRef.current?.getTracks().forEach(t => t.stop());
-        cancelAnimationFrame(animFrameRef.current);
-        if (timerRef.current) clearInterval(timerRef.current);
-    }, []);
+    }, [animateWaveform, stop]);
 
     const reset = useCallback(() => {
         stop();

@@ -17,8 +17,6 @@ import {
     PolarGrid,
     PolarAngleAxis,
     Radar,
-    LineChart,
-    Line,
     Legend,
 } from 'recharts';
 import CountUp from 'react-countup';

@@ -300,7 +300,7 @@ export default function CulturalDiffInspector() {
     const tx = TRANSFORMATIONS[selected];
     const renderedLocalized = useMemo(
         () => renderWithChips(tx.localized, tx.slangs, setHoveredSlang),
-        [tx, selected]
+        [tx]
     );
 
     return (

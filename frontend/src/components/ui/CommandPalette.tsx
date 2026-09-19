@@ -128,6 +128,7 @@ export default function CommandPalette() {
     const inputRef = useRef<HTMLInputElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const campaigns = useMemo(() => loadCampaigns(), [open]);
 
     const close = useCallback(() => {
@@ -410,10 +411,9 @@ export default function CommandPalette() {
         [campaigns, navigate, close]
     );
 
-    const allItems = [...staticItems, ...recentItems];
-
     // Filter
     const filtered = useMemo(() => {
+        const allItems = [...staticItems, ...recentItems];
         if (!query) return allItems;
         const q = query.toLowerCase();
         return allItems.filter(
@@ -423,7 +423,7 @@ export default function CommandPalette() {
                 item.keywords?.some(k => k.toLowerCase().includes(q)) ||
                 item.category.toLowerCase().includes(q)
         );
-    }, [query, allItems]);
+    }, [query, staticItems, recentItems]);
 
     // Group by category
     const grouped = useMemo(() => {

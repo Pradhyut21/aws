@@ -24,7 +24,7 @@ export default function AgentStatus({ stages, currentStage }: AgentStatusProps) 
                 const status = stage?.status || 'waiting';
                 const isActive = status === 'running';
                 const isDone = status === 'done';
-                const isWaiting = status === 'waiting' && currentStage <= i;
+                const _isWaiting = status === 'waiting' && currentStage <= i;
 
                 return (
                     <motion.div

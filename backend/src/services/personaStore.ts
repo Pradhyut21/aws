@@ -605,7 +605,9 @@ export async function getPersonas(): Promise<IndianPersona[]> {
             })
         );
         if (result.Items && result.Items.length > 0) {
-            return result.Items.map(({ PK, SK, _type, ...rest }) => rest as IndianPersona);
+            return result.Items.map(
+                ({ PK: _PK, SK: _SK, _type, ...rest }) => rest as IndianPersona
+            );
         }
     } catch (err: any) {
         console.warn('[personaStore] getPersonas fallback to in-memory:', err.message);
@@ -641,7 +643,7 @@ export async function getPersonaReview(campaignId: string): Promise<BharatResona
             })
         );
         if (!result.Item) return null;
-        const { PK, SK, _type, ...rest } = result.Item;
+        const { PK: _PK, SK: _SK, _type, ...rest } = result.Item;
         return rest as BharatResonanceScore;
     } catch {
         return null;

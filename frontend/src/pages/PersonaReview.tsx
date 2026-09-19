@@ -274,7 +274,7 @@ export default function PersonaReview() {
     }, [polling, poll]);
 
     // ── Start review ───────────────────────────────────────────────────────────
-    const startReview = async () => {
+    const startReview = useCallback(async () => {
         if (!campaignId) return;
         setLoading(true);
         setError(null);
@@ -296,12 +296,12 @@ export default function PersonaReview() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [campaignId]);
 
     // Auto-start if no data
     useEffect(() => {
         if (campaignId && !data) startReview();
-    }, [campaignId]);
+    }, [campaignId, data, startReview]);
 
     const filtered =
         data?.personaResults.filter(p => (filter === 'ALL' ? true : p.verdict === filter)) ?? [];

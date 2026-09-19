@@ -30,7 +30,7 @@
  *   Persist  — DynamoDB (campaign, trace, experiment, lesson)
  */
 
-import { getCampaign, updateCampaign, Campaign } from '../services/store';
+import { updateCampaign, Campaign } from '../services/store';
 import { runResearchAgent } from './researchAgent';
 import { runCreativeSwarm } from './creativeSwarm';
 import { runQualityGuard } from './qualityGuard';

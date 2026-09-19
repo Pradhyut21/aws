@@ -74,7 +74,7 @@ export interface AuthToken {
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
 function stripMeta(item: Record<string, any>): any {
-    const { PK, SK, _type, ...rest } = item;
+    const { PK: _PK, SK: _SK, _type, ...rest } = item;
     return rest;
 }
 
@@ -170,7 +170,7 @@ export async function getUserById(userId: string): Promise<User | undefined> {
     );
     if (!result.Item) return undefined;
     const item = stripMeta(result.Item);
-    const { password, ...userWithoutPassword } = item;
+    const { password: _password, ...userWithoutPassword } = item;
     return userWithoutPassword as User;
 }
 
@@ -199,6 +199,6 @@ export async function updateUser(userId: string, updates: Partial<User>): Promis
         })
     );
 
-    const { password, ...userWithoutPassword } = updated;
+    const { password: _password, ...userWithoutPassword } = updated;
     return userWithoutPassword as User;
 }

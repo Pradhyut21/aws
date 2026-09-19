@@ -137,7 +137,9 @@ export async function getCampaignTrace(campaignId: string): Promise<AgentTraceSt
             ScanIndexForward: true,
         })
     );
-    return (result.Items || []).map(({ PK, SK, _type, ...rest }) => rest as AgentTraceStep);
+    return (result.Items || []).map(
+        ({ PK: _PK, SK: _SK, _type, ...rest }) => rest as AgentTraceStep
+    );
 }
 
 // ─── EXPERIMENTS ──────────────────────────────────────────────────────────────
@@ -174,7 +176,7 @@ export async function getExperiment(expId: string): Promise<Experiment | undefin
         })
     );
     if (!result.Item) return undefined;
-    const { PK, SK, _type, ...rest } = result.Item;
+    const { PK: _PK, SK: _SK, _type, ...rest } = result.Item;
     return rest as Experiment;
 }
 
@@ -192,7 +194,7 @@ export async function getUserExperiments(userId: string): Promise<Experiment[]> 
         })
     );
     return (result.Items || []).map(
-        ({ PK, SK, GSI1PK, GSI1SK, _type, ...rest }) => rest as Experiment
+        ({ PK: _PK, SK: _SK, GSI1PK: _G1P, GSI1SK: _G1S, _type, ...rest }) => rest as Experiment
     );
 }
 
@@ -256,7 +258,9 @@ export async function getUserLessons(userId: string, limit: number = 10): Promis
             Limit: limit,
         })
     );
-    return (result.Items || []).map(({ PK, SK, _type, ...rest }) => rest as LessonLearned);
+    return (result.Items || []).map(
+        ({ PK: _PK, SK: _SK, _type, ...rest }) => rest as LessonLearned
+    );
 }
 
 // ─── BHARATBRAIN DOCS ────────────────────────────────────────────────────────
@@ -295,7 +299,9 @@ export async function getUserBrainDocs(userId: string): Promise<BharatBrainDoc[]
             ScanIndexForward: false,
         })
     );
-    return (result.Items || []).map(({ PK, SK, _type, ...rest }) => rest as BharatBrainDoc);
+    return (result.Items || []).map(
+        ({ PK: _PK, SK: _SK, _type, ...rest }) => rest as BharatBrainDoc
+    );
 }
 
 export async function deleteBrainDoc(userId: string, docId: string): Promise<boolean> {
@@ -323,7 +329,9 @@ export async function scanRecentTraces(limit: number = 50): Promise<AgentTraceSt
             Limit: 200, // scan up to 200, sort, return limit
         })
     );
-    const items = (result.Items || []).map(({ PK, SK, _type, ...rest }) => rest as AgentTraceStep);
+    const items = (result.Items || []).map(
+        ({ PK: _PK, SK: _SK, _type, ...rest }) => rest as AgentTraceStep
+    );
     // Sort by timestamp descending and take the most recent
     return items.sort((a, b) => b.timestamp.localeCompare(a.timestamp)).slice(0, limit);
 }

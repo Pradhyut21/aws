@@ -11,7 +11,7 @@ interface CreativeOutput {
 
 export async function runCreativeSwarm(
     campaign: Campaign,
-    research: object
+    _research: object
 ): Promise<CreativeOutput> {
     const lang = campaign.language;
     const langMap: Record<string, string> = {
@@ -76,7 +76,7 @@ Format:
 
         // Get video script from Nova Reel
         const videoResponse = await invokeNovaReel(videoPrompt, 500);
-        const videoScript = parseJsonString(videoResponse);
+        const _videoScript = parseJsonString(videoResponse);
 
         // Generate image from Titan
         let imageUrl = 'https://picsum.photos/seed/bm1/800/600';

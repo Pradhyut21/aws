@@ -13,7 +13,7 @@
  */
 
 import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { toPng } from 'html-to-image';
 import Sidebar from '../components/layout/Sidebar';

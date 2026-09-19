@@ -61,7 +61,6 @@ const PERSONAS = [
 
 // ─── Debate Message Generator ──────────────────────────────────────────────────
 function generateDebate(copy: string): ChatMessage[] {
-    const lower = copy.toLowerCase();
     const hasPrice = /\d+%|₹\d|rupee|off|discount|free|मुफ्त|फ्री/i.test(copy);
     const hasFestival =
         /diwali|holi|eid|pongal|navratri|ganesh|onam|deepavali|festival|उत्सव/i.test(copy);
@@ -283,7 +282,6 @@ export default function BharatFocusGroup() {
 
         for (let i = 0; i < allMessages.length; i++) {
             const msg = allMessages[i];
-            const persona = PERSONAS.find(p => p.id === msg.persona)!;
             setTyping(msg.persona);
             await new Promise(r => setTimeout(r, 900 + Math.random() * 500));
             setTyping(null);

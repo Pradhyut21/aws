@@ -173,7 +173,7 @@ export default function AudioWaveStudio() {
             audioRef.current.pause();
             audioRef.current = null;
         }
-    }, [persona]);
+    }, [persona, p.sampleText]);
 
     // Progress ticker for visual waveform while audio plays
     useEffect(() => {

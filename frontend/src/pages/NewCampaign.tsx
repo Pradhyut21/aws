@@ -1,11 +1,10 @@
-import { useState, useCallback, lazy, Suspense, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from '../components/layout/Sidebar';
 import VoiceRecorder from '../components/ui/VoiceRecorder';
 import LanguageSelector from '../components/ui/LanguageSelector';
-import AgentStatus from '../components/ui/AgentStatus';
 import CampaignCard from '../components/ui/CampaignCard';
 import BharatScore from '../components/ui/BharatScore';
 import PhoneMockup from '../components/ui/PhoneMockup';
@@ -22,8 +21,6 @@ import { createCampaign, translateCaptions, analyzeCopy } from '../lib/api';
 import { MOCK_CAMPAIGN, DEMO_VOICE_TEXT } from '../lib/mockData';
 import { BUSINESS_TYPES, INDIAN_STATES, PLATFORMS } from '../lib/constants';
 import type { Campaign } from '../lib/types';
-
-const AgentPipeline3D = lazy(() => import('../components/3d/AgentPipeline3D'));
 
 type Step = 1 | 2 | 3;
 
@@ -103,7 +100,7 @@ export default function NewCampaign() {
         },
     ]);
 
-    const { stages, currentStage, isComplete, simulatePipeline } = useCampaignPipeline(campaignId);
+    const { currentStage, simulatePipeline } = useCampaignPipeline(campaignId);
     const langDetect = useLanguageDetect(textInput);
 
     // Auto-detect business type and regions based on user input
@@ -170,14 +167,6 @@ export default function NewCampaign() {
             setBusinessType('construction');
         }
     }, [textInput, step]);
-
-    const handleVoiceDemo = useCallback(() => {
-        setTextInput(DEMO_VOICE_TEXT);
-        setLanguage('hi');
-        setBusinessType('handicraft');
-        setRegions(['Uttar Pradesh', 'Delhi']);
-        handleSubmit();
-    }, []);
 
     const handleSubmit = useCallback(async () => {
         setStep(2);
@@ -444,7 +433,13 @@ export default function NewCampaign() {
         selectedPlatforms,
     ]);
 
-    const PIPELINE_STAGES_DURATION = 10000;
+    const handleVoiceDemo = useCallback(() => {
+        setTextInput(DEMO_VOICE_TEXT);
+        setLanguage('hi');
+        setBusinessType('handicraft');
+        setRegions(['Uttar Pradesh', 'Delhi']);
+        handleSubmit();
+    }, [handleSubmit]);
 
     const handlePublishAll = () => {
         setPublishSuccess(true);
@@ -901,7 +896,7 @@ export default function NewCampaign() {
                                     { label: 'Bedrock', color: '#FF9900', angle: 144 },
                                     { label: 'Nova Sonic', color: '#A855F7', angle: 216 },
                                     { label: 'Guardrails', color: '#F7C948', angle: 288 },
-                                ].map((item, i) => (
+                                ].map(item => (
                                     <motion.div
                                         key={item.label}
                                         className="absolute text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap"

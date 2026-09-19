@@ -11,7 +11,7 @@ import { logger } from '../lib/logger';
 
 export async function runDistributionAgent(
     campaign: Campaign,
-    creative: object
+    _creative: object
 ): Promise<{
     publishTimes: Record<string, string>;
     suggestedInfluencers: string[];

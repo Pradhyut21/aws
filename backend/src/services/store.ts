@@ -54,7 +54,6 @@ import {
     PutCommand,
     GetCommand,
     QueryCommand,
-    UpdateCommand,
     DeleteCommand,
 } from '@aws-sdk/lib-dynamodb';
 
@@ -186,7 +185,16 @@ export async function createTableIfNotExists(): Promise<void> {
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 
 function stripMeta(item: Record<string, any>): any {
-    const { PK, SK, GSI1PK, GSI1SK, GSI2PK, GSI2SK, _type, ...rest } = item;
+    const {
+        PK: _PK,
+        SK: _SK,
+        GSI1PK: _G1P,
+        GSI1SK: _G1S,
+        GSI2PK: _G2P,
+        GSI2SK: _G2S,
+        _type,
+        ...rest
+    } = item;
     return rest;
 }
 

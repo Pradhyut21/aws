@@ -217,7 +217,7 @@ export default function ExperimentLab() {
 
                         {/* Variants */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            {(selected.variants ?? []).map((v: any, i: number) => (
+                            {(selected.variants ?? []).map((v: any, _i: number) => (
                                 <div
                                     key={v.id}
                                     style={{

@@ -4,11 +4,9 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import http from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
-import { v4 as uuidv4 } from 'uuid';
 import { body, param, validationResult } from 'express-validator';
 import rateLimit from 'express-rate-limit';
 import {
-    Campaign,
     createCampaign,
     getCampaign,
     getUserCampaigns,
@@ -18,7 +16,6 @@ import {
     getUserTemplates,
     getPublicTemplates,
     getOrCreateAnalytics,
-    updateAnalytics,
     createTableIfNotExists,
 } from './services/store';
 import {
@@ -28,13 +25,11 @@ import {
     updateUser,
     verifyPassword,
     generateToken,
-    User,
 } from './services/auth';
 import { authMiddleware, optionalAuthMiddleware, AuthRequest } from './middleware/auth';
 import { runPipeline } from './agents/pipeline';
 import {
     getCampaignTrace,
-    createExperiment,
     getExperiment,
     getUserExperiments,
     updateExperiment,
@@ -929,7 +924,12 @@ app.post(
     handleValidationErrors,
     async (req: AuthRequest, res: Response) => {
         try {
-            const { businessType, region, language, platform = 'instagram' } = req.body;
+            const {
+                businessType: _businessType,
+                region,
+                language,
+                platform = 'instagram',
+            } = req.body;
 
             // Model-informed estimates based on region + business type
             const regionMultipliers: Record<string, number> = {
