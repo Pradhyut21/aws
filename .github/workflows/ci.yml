@@ -1,0 +1,150 @@
+name: CI — Lint, Test, Build
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ─── Job 1: Lint (ESLint + Prettier check) ──────────────────────────────────
+  lint:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install root dependencies (ESLint + Prettier)
+        run: npm ci
+
+      - name: Install backend dependencies
+        run: npm ci --prefix backend
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Check Prettier formatting
+        run: npm run format:check
+
+  # ─── Job 2: Backend unit & integration tests ────────────────────────────────
+  test-backend:
+    name: Backend Tests (Jest)
+    runs-on: ubuntu-latest
+    needs: lint
+    env:
+      NODE_ENV: test
+      # Dummy secrets — real values not needed for mocked unit tests
+      JWT_SECRET: ci-test-jwt-secret-do-not-use
+      AWS_REGION: us-east-1
+      DYNAMODB_TABLE: bharatmedia-ci-test
+      S3_BUCKET_NAME: bharatmedia-ci-test-bucket
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        run: npm ci --prefix backend
+
+      - name: Run Jest tests with coverage
+        run: npm run test:coverage --prefix backend
+
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          flags: backend
+          directory: backend/coverage
+        continue-on-error: true  # Don't fail CI if Codecov is unavailable
+
+  # ─── Job 3: Frontend component tests ────────────────────────────────────────
+  test-frontend:
+    name: Frontend Tests (Vitest)
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Run Vitest with coverage
+        run: npm run test:coverage --prefix frontend
+
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          flags: frontend
+          directory: frontend/coverage
+        continue-on-error: true
+
+  # ─── Job 4: TypeScript compilation + build ──────────────────────────────────
+  build:
+    name: TypeScript Build Check
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install all dependencies
+        run: |
+          npm ci
+          npm ci --prefix backend
+          npm ci --prefix frontend
+
+      - name: Build backend (tsc)
+        working-directory: backend
+        run: npm run build
+
+      - name: Build frontend (vite)
+        working-directory: frontend
+        env:
+          # Use placeholder values for build — real values set in deployment
+          VITE_API_URL: https://api.bharatmedia.in
+        run: npm run build
+
+      - name: Upload frontend build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+          retention-days: 7

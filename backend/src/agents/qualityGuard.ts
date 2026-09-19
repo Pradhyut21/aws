@@ -22,6 +22,7 @@
 
 import { Agent, tool } from '../lib/strands';
 import { checkContentSafety } from '../services/bedrock';
+import { logger } from '../lib/logger';
 
 export interface QualityOutput {
     passed: boolean;
@@ -101,10 +102,12 @@ export async function runQualityGuard(content: object): Promise<QualityOutput> {
 
     try {
         const output = await agent.invoke(JSON.stringify({ content })) as QualityOutput;
-        console.log('✅ Quality Guard completed — BharatScore:', output.bharatScore.total);
+        logger.info('Quality Guard completed', { bharatScore: output.bharatScore.total, passed: output.passed });
         return output;
-    } catch (error) {
-        console.error('Quality guard error:', error);
+    } catch (error: unknown) {
+        logger.error('Quality guard error — using safe fallback', {
+            error: error instanceof Error ? error.message : String(error),
+        });
         return {
             passed: true,
             bharatScore: { total: 82, culturalFit: 25, seoScore: 20, engagementPotential: 20, platformOptimization: 17 },

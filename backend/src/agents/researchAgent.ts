@@ -13,6 +13,7 @@ import { Agent, tool } from '../lib/strands';
 import { invokeNovaPro } from '../services/bedrock';
 import type { Campaign } from '../services/store';
 import { getUserLessons } from '../services/v3store';
+import { logger } from '../lib/logger';
 
 export interface ResearchOutput {
     trendingFormats: string[];
@@ -87,10 +88,12 @@ export async function runResearchAgent(campaign: Campaign): Promise<ResearchOutp
 
     try {
         const output = await agent.invoke(JSON.stringify({ campaign, lessons })) as ResearchOutput;
-        console.log('✅ Research Agent completed');
+        logger.info('Research Agent completed', { region: campaign.region, evidenceCount: output.evidence?.length ?? 0 });
         return output;
-    } catch (error) {
-        console.warn('Research agent failed, using contextual fallback:', error);
+    } catch (error: unknown) {
+        logger.warn('Research agent failed — using contextual fallback', {
+            error: error instanceof Error ? error.message : String(error),
+        });
         return {
             trendingFormats: ['Short-form video with local music', 'Carousel showing process/behind-scenes', 'Customer testimonial reels'],
             demographics:    `Local audience in ${campaign.region.join(', ')}, aged 22–45, mobile-first`,

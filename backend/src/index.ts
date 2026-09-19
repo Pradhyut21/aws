@@ -54,6 +54,8 @@ import { runPersonaSwarm }   from './agents/personaSwarm';
 import { getPersonaReview, seedPersonas } from './services/personaStore';
 import multer from 'multer';
 import { transcribeAudioBuffer, LANG_DISPLAY_NAMES } from './services/transcribe';
+import { errorHandler } from './middleware/errorHandler';
+import { logger } from './lib/logger';
 
 // ─── Multer: memory storage for voice audio uploads (max 10 MB) ───────────
 const audioUpload = multer({
@@ -131,14 +133,9 @@ const handleValidationErrors = (req: Request, res: Response, next: NextFunction)
     next();
 };
 
-// Global error handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    console.error('Error:', err);
-    if (err.message === 'CORS not allowed') {
-        return res.status(403).json({ error: 'CORS not allowed' });
-    }
-    res.status(500).json({ error: 'Internal server error', message: process.env.NODE_ENV === 'development' ? err.message : undefined });
-});
+// Global error handler — replaces the previous inline handler.
+// Handles AppError subclasses with typed HTTP codes and suppresses stack traces in prod.
+app.use(errorHandler);
 
 // Broadcast to all WS clients for a campaign
 function broadcast(campaignId: string, data: object) {
@@ -1352,15 +1349,16 @@ createTableIfNotExists()
     .catch((err) => {
         console.warn(`\n⚠️  DynamoDB init failed (${err.message})`);
         console.warn('   Running in DEGRADED mode — AWS features unavailable.');
-        console.warn('   Set valid AWS credentials to enable full functionality.\n');
+        logger.warn('DynamoDB table not reachable — check AWS credentials', {});
     })
     .finally(() => {
         server.listen(PORT, () => {
-            console.log(`\n🚀 BharatMedia API v3.0 running on http://localhost:${PORT}`);
-            console.log(`📡 WebSocket server on ws://localhost:${PORT}/ws`);
-            console.log(`🗄️  DynamoDB table: ${process.env.DYNAMODB_TABLE || 'bharatmedia-dev'}`);
-            console.log(`👥 BharatPersonaSwarm: 20 Indian personas ready`);
-            console.log(`🪣  S3 bucket: ${process.env.S3_BUCKET_NAME || 'bharatmedia-images-dev'}\n`);
+            logger.info('BharatMedia API v3.0 started', {
+                port: PORT,
+                wsUrl: `ws://localhost:${PORT}/ws`,
+                dynamoTable: process.env.DYNAMODB_TABLE || 'bharatmedia-dev',
+                s3Bucket: process.env.S3_BUCKET_NAME || 'bharatmedia-images-dev',
+            });
         });
     });
 

@@ -6,9 +6,21 @@
   "scripts": {
     "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
     "install:all": "npm install && npm install --prefix frontend && npm install --prefix backend",
-    "build": "npm run build --prefix frontend && npm run build --prefix backend"
+    "build": "npm run build --prefix frontend && npm run build --prefix backend",
+    "lint": "eslint \"backend/src/**/*.ts\" \"frontend/src/**/*.{ts,tsx}\" --max-warnings 0",
+    "lint:fix": "eslint \"backend/src/**/*.ts\" \"frontend/src/**/*.{ts,tsx}\" --fix",
+    "format": "prettier --write \"backend/src/**/*.ts\" \"frontend/src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"backend/src/**/*.ts\" \"frontend/src/**/*.{ts,tsx}\"",
+    "test": "npm test --prefix backend && npm test --prefix frontend",
+    "test:coverage": "npm run test:coverage --prefix backend && npm run test:coverage --prefix frontend"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "prettier": "^3.3.3"
   }
 }

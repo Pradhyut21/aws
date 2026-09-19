@@ -7,6 +7,7 @@
  */
 import type { Campaign } from '../services/store';
 import { invokeNovaSonic } from '../services/bedrock';
+import { logger } from '../lib/logger';
 
 export async function runDistributionAgent(campaign: Campaign, creative: object): Promise<{
     publishTimes: Record<string, string>;
@@ -52,8 +53,11 @@ Return ONLY valid JSON (no markdown):
             suggestedInfluencers: parsed.suggestedInfluencers || [],
             estimatedReach:       parsed.estimatedReach,
         };
-    } catch (error) {
-        console.error('Distribution agent error:', error);
+    } catch (error: unknown) {
+        logger.error('Distribution agent error — using fallback', {
+            campaignId: campaign.id,
+            error: error instanceof Error ? error.message : String(error),
+        });
         // Fallback: model-informed defaults (not random numbers)
         const regionSizes: Record<string, number> = {
             'Mumbai': 85000, 'Delhi': 90000, 'Bengaluru': 70000,

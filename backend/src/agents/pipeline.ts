@@ -43,6 +43,7 @@ import {
     computeContentHash,
 } from '../services/v3store';
 import { invokeNovaOmni } from '../services/bedrock';
+import { logger } from '../lib/logger';
 
 type BroadcastFn = (event: object) => void;
 
@@ -51,8 +52,9 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Pro
     const timer = new Promise<T>((_, reject) =>
         setTimeout(() => reject(new Error(`Stage timed out after ${ms}ms`)), ms)
     );
-    return Promise.race([promise, timer]).catch((err) => {
-        console.warn(`⚠️  withTimeout (${ms}ms): ${err.message} — using fallback`);
+    return Promise.race([promise, timer]).catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : String(err);
+        logger.warn('Stage timeout — using fallback', { timeoutMs: ms, error: message });
         return fallback;
     });
 }
@@ -93,8 +95,10 @@ Return ONLY the caption text (no JSON, no quotes).`;
             language: `${campaign.language}+en`,
             content:  { captions: { instagram: bilingual.trim() }, images: creative.images },
         });
-    } catch {
-        // Skip bilingual variant if Bedrock unavailable
+    } catch (err: unknown) {
+        logger.warn('Bilingual variant generation failed — skipping', {
+            error: err instanceof Error ? err.message : String(err),
+        });
     }
 
     return variants;
@@ -124,9 +128,12 @@ async function extractAndSaveLesson(campaign: Campaign, quality: any, distributi
             lesson,
             campaignId:   campaign.id,
         });
-        console.log('✅ Learning lesson saved to DynamoDB');
-    } catch (err) {
-        console.warn('Could not save learning lesson:', err);
+        logger.info('Learning lesson saved to DynamoDB', { campaignId: campaign.id, score });
+    } catch (err: unknown) {
+        logger.warn('Could not save learning lesson', {
+            campaignId: campaign.id,
+            error: err instanceof Error ? err.message : String(err),
+        });
     }
 }
 
@@ -181,14 +188,20 @@ export async function runPipeline(campaignId: string, campaign: Campaign, broadc
                 try {
                     const result = await withTimeout(runCreativeSwarm(campaign, research), 60_000, null);
                     if (result) return result;
-                    if (creativeAttempts < MAX_CREATIVE_ATTEMPTS) {
-                        console.warn(`[Pipeline] Creative attempt ${creativeAttempts} returned null — retrying only Creative (Research preserved)`);
+                            if (creativeAttempts < MAX_CREATIVE_ATTEMPTS) {
+                        logger.warn('Creative attempt returned null — retrying', {
+                            attempt: creativeAttempts,
+                            maxAttempts: MAX_CREATIVE_ATTEMPTS,
+                        });
                         broadcast({ type: 'stage_update', campaignId, stage: 2, label: 'Creative Swarm', status: 'running',
                             detail: `Retry ${creativeAttempts}/${MAX_CREATIVE_ATTEMPTS}: regenerating with stronger cultural prompt…` });
                     }
-                } catch (err: any) {
+                } catch (err: unknown) {
                     if (creativeAttempts >= MAX_CREATIVE_ATTEMPTS) throw err;
-                    console.warn(`[Pipeline] Creative attempt ${creativeAttempts} failed — retrying: ${err.message}`);
+                    logger.warn('Creative attempt failed — retrying', {
+                        attempt: creativeAttempts,
+                        error: err instanceof Error ? err.message : String(err),
+                    });
                 }
             }
             throw new Error('Creative Swarm failed after all retries');
@@ -277,8 +290,11 @@ export async function runPipeline(campaignId: string, campaign: Campaign, broadc
                 status: 'running',
             });
             await trace(campaignId, 'experiment_engine', {}, { experimentId: experiment.id, variantCount: variants.length }, 0);
-        } catch (expErr) {
-            console.warn('Experiment creation failed (non-critical):', expErr);
+        } catch (expErr: unknown) {
+            logger.warn('Experiment creation failed (non-critical)', {
+                campaignId,
+                error: expErr instanceof Error ? expErr.message : String(expErr),
+            });
         }
 
         // 5c. Extract and save learning lesson (V3)
@@ -296,12 +312,14 @@ export async function runPipeline(campaignId: string, campaign: Campaign, broadc
             }
         });
 
-    } catch (err: any) {
-        console.error('Pipeline error:', err.message, err.stack);
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        const stack = err instanceof Error ? err.stack : undefined;
+        logger.error('Pipeline failed', { campaignId, error: message, stack });
         await updateCampaign(campaignId, { status: 'error' }).catch(() => {});
         broadcast({
             type: 'error', campaignId,
-            message: `Pipeline failed: ${err.message || String(err)}`,
+            message: `Pipeline failed: ${message}`,
             timestamp: new Date().toISOString()
         });
     }

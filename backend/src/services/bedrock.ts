@@ -1,6 +1,8 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '../lib/logger';
+import { BedrockError } from '../lib/errors';
 
 // Initialize the Bedrock client
 const client = new BedrockRuntimeClient({ region: process.env.AWS_REGION || 'us-east-1' });
@@ -35,81 +37,86 @@ const s3Client   = new S3Client({ region: S3_REGION });
 
 // Helper function to invoke Claude (always available)
 async function invokeClaude(prompt: string, maxTokens: number = 2000): Promise<string> {
+    const MODEL_ID = 'anthropic.claude-3-haiku-20240307-v1:0';
     try {
         const payload = {
-            anthropic_version: "bedrock-2023-05-31",
+            anthropic_version: 'bedrock-2023-05-31',
             max_tokens: maxTokens,
-            messages: [{ role: "user", content: prompt }],
+            messages: [{ role: 'user', content: prompt }],
             temperature: 0.7,
         };
 
         const command = new InvokeModelCommand({
-            modelId: "anthropic.claude-3-haiku-20240307-v1:0",
-            contentType: "application/json",
-            accept: "application/json",
+            modelId: MODEL_ID,
+            contentType: 'application/json',
+            accept: 'application/json',
             body: JSON.stringify(payload),
         });
 
         const response = await client.send(command);
         const responseBody = JSON.parse(new TextDecoder().decode(response.body));
         return responseBody.content[0].text;
-    } catch (error) {
-        console.error("Claude error:", error);
-        throw error;
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        logger.error('Claude invocation failed', { modelId: MODEL_ID, error: message });
+        throw new BedrockError(message, MODEL_ID);
     }
 }
 
 // ─── NOVA PRO (Research, Analysis, SEO) ───────────────────────────────────
 export async function invokeNovaPro(prompt: string, maxTokens: number = 2000): Promise<string> {
-    console.log('🔍 Invoking Nova Pro for research...');
+    const MODEL_ID = 'us.amazon.nova-pro-v1:0';
+    logger.info('Invoking Nova Pro for research', { modelId: MODEL_ID, maxTokens });
     try {
-        // Try Nova Pro first
         const payload = {
-            schemaVersion: "messages-v1",
-            messages: [{ role: "user", content: [{ text: prompt }] }],
+            schemaVersion: 'messages-v1',
+            messages: [{ role: 'user', content: [{ text: prompt }] }],
             inferenceConfig: { maxTokens, temperature: 0.7 },
         };
 
         const command = new InvokeModelCommand({
-            modelId: "us.amazon.nova-pro-v1:0",
-            contentType: "application/json",
-            accept: "application/json",
+            modelId: MODEL_ID,
+            contentType: 'application/json',
+            accept: 'application/json',
             body: JSON.stringify(payload),
         });
 
         const response = await client.send(command);
         const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-        console.log('✅ Nova Pro success');
+        logger.info('Nova Pro invocation succeeded', { modelId: MODEL_ID });
         return responseBody.output.message.content[0].text;
-    } catch (error: any) {
-        console.log('⚠️ Nova Pro not available, using Claude:', error.message);
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        logger.warn('Nova Pro unavailable — falling back to Claude', { modelId: MODEL_ID, error: message });
         return await invokeClaude(prompt, maxTokens);
     }
 }
 
 // ─── NOVA OMNI (Multilingual Content Generation) ────────────────────────────
 export async function invokeNovaOmni(prompt: string, maxTokens: number = 1500): Promise<string> {
-    console.log('🎨 Invoking Nova Omni for content...');
+    const MODEL_ID = 'us.amazon.nova-lite-v1:0';
+    logger.info('Invoking Nova Omni for content generation', { modelId: MODEL_ID, maxTokens });
     try {
         const payload = {
-            schemaVersion: "messages-v1",
-            messages: [{ role: "user", content: [{ text: prompt }] }],
+            schemaVersion: 'messages-v1',
+            messages: [{ role: 'user', content: [{ text: prompt }] }],
             inferenceConfig: { maxTokens, temperature: 0.8 },
         };
 
         const command = new InvokeModelCommand({
-            modelId: "us.amazon.nova-lite-v1:0",
-            contentType: "application/json",
-            accept: "application/json",
+            modelId: MODEL_ID,
+            contentType: 'application/json',
+            accept: 'application/json',
             body: JSON.stringify(payload),
         });
 
         const response = await client.send(command);
         const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-        console.log('✅ Nova Omni success');
+        logger.info('Nova Omni invocation succeeded', { modelId: MODEL_ID });
         return responseBody.output.message.content[0].text;
-    } catch (error: any) {
-        console.log('⚠️ Nova Omni not available, using Claude:', error.message);
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        logger.warn('Nova Omni unavailable — falling back to Claude', { modelId: MODEL_ID, error: message });
         return await invokeClaude(prompt, maxTokens);
     }
 }
@@ -131,7 +138,7 @@ export async function invokeNovaOmni(prompt: string, maxTokens: number = 1500): 
 //   2. Pass the script text as the prompt
 //   3. Poll S3 for the rendered .mp4 output
 export async function invokeNovaReel(prompt: string, maxTokens: number = 1000): Promise<string> {
-    console.log('🎬 [Video Script Generator → Nova Lite] Generating structured video script...');
+    logger.info('Generating structured video script via Nova Lite');
     return await invokeNovaOmni(prompt, maxTokens);
 }
 
@@ -150,7 +157,7 @@ export async function invokeNovaReel(prompt: string, maxTokens: number = 1000): 
 // Production upgrade path:
 //   Replace with Nova Sonic Bedrock Streaming API for real-time voice responses.
 export async function invokeNovaSonic(prompt: string, maxTokens: number = 500): Promise<string> {
-    console.log('🎤 [Distribution Copy → Claude] Generating distribution copy text...');
+    logger.info('Generating distribution copy text via Claude');
     return await invokeClaude(prompt, maxTokens);
 }
 
@@ -165,7 +172,7 @@ export async function invokeNovaSonic(prompt: string, maxTokens: number = 500): 
  * @returns       Public S3 URL: https://<bucket>.s3.<region>.amazonaws.com/campaigns/<year>/<month>/<uuid>.png
  */
 export async function generateTitanImage(prompt: string, width: number = 1024, height: number = 1024): Promise<string> {
-    console.log('🖼️ Generating image with Titan Image Generator...');
+    logger.info('Generating image with Titan Image Generator', { width, height });
     const payload = {
         taskType: "TEXT_IMAGE",
         textToImageParams: {
@@ -192,35 +199,42 @@ export async function generateTitanImage(prompt: string, width: number = 1024, h
     const response = await client.send(command);
     const responseBody = JSON.parse(new TextDecoder().decode(response.body));
     const base64Image: string = responseBody.images[0];
-    console.log('✅ Titan image generated — uploading to S3...');
+    logger.info('Titan image generated — uploading to S3');
 
     // Decode base64 → Buffer and upload to S3
     const imageBuffer = Buffer.from(base64Image, 'base64');
-    const now         = new Date();
-    const key         = `campaigns/${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${uuidv4()}.png`;
+    const now = new Date();
+    const key = `campaigns/${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${uuidv4()}.png`;
 
     try {
-        await s3Client.send(new PutObjectCommand({
-            Bucket:       S3_BUCKET,
-            Key:          key,
-            Body:         imageBuffer,
-            ContentType:  'image/png',
-            CacheControl: 'max-age=31536000',
-            // ACL is set via bucket policy (public-read) rather than per-object
-            // to avoid "AccessControlListNotSupported" on buckets with ACLs disabled.
-        }));
-    } catch (s3Err: any) {
-        throw new Error(`S3 upload failed: ${s3Err.message}`);
+        await s3Client.send(
+            new PutObjectCommand({
+                Bucket: S3_BUCKET,
+                Key: key,
+                Body: imageBuffer,
+                ContentType: 'image/png',
+                CacheControl: 'max-age=31536000',
+                // ACL is set via bucket policy (public-read) rather than per-object
+                // to avoid "AccessControlListNotSupported" on buckets with ACLs disabled.
+            })
+        );
+    } catch (s3Err: unknown) {
+        const message = s3Err instanceof Error ? s3Err.message : String(s3Err);
+        logger.error('S3 upload failed', { bucket: S3_BUCKET, key, error: message });
+        throw new Error(`S3 upload failed: ${message}`);
     }
 
     const publicUrl = `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com/${key}`;
-    console.log(`✅ Image uploaded to S3: ${publicUrl}`);
+    logger.info('Image uploaded to S3', { publicUrl });
     return publicUrl;
 }
 
 // ─── BEDROCK GUARDRAILS (Content Safety & Cultural Sensitivity) ───────────
-export async function checkContentSafety(content: string, language: string = "en"): Promise<{ safe: boolean; score: number; issues: string[] }> {
-    console.log('🛡️ Checking content safety with Bedrock...');
+export async function checkContentSafety(
+    content: string,
+    language = 'en'
+): Promise<{ safe: boolean; score: number; issues: string[] }> {
+    logger.info('Checking content safety with Bedrock guardrails', { language });
 
     // Use Nova Pro to act as a deep semantic guardrail and quality rater
     const prompt = `You are a strict content safety and cultural quality guardrail system for an Indian audience.
@@ -250,13 +264,13 @@ ${content}`;
             score: parsed.score ?? 85,
             issues: parsed.issues || [],
         };
-    } catch (error) {
-        console.error('Guardrails error:', error);
-        // Fallback to safe
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        logger.error('Content safety check failed — using fallback', { error: message });
         return {
             safe: true,
             score: 80,
-            issues: ["Failed to run rigorous safety check. Displaying default fallback score."],
+            issues: ['Failed to run rigorous safety check. Displaying default fallback score.'],
         };
     }
 }
