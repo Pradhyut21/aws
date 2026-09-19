@@ -69,7 +69,9 @@ export default function NewCampaign() {
                 if (bt) setBusinessType(bt);
                 sessionStorage.removeItem('template');
                 toast.info('Template loaded! Click Generate to create your campaign. 📁');
-            } catch { }
+            } catch {
+                /* ignore corrupted template */
+            }
         } else if (recent) {
             try {
                 const data = JSON.parse(recent);
@@ -83,7 +85,9 @@ export default function NewCampaign() {
                 }
                 sessionStorage.removeItem('recentCampaign');
                 toast.info('Loaded campaign from history! 🕰️');
-            } catch { }
+            } catch {
+                /* ignore corrupted recent campaign */
+            }
         }
     }, []);
 

@@ -76,7 +76,13 @@ export function useCampaignPipeline(campaignId: string | null) {
         const token = localStorage.getItem('authToken') ?? '';
         const es = new EventSource(`${apiBase}/api/campaign/${campaignId}/stream?token=${encodeURIComponent(token)}`);
         sseRef.current = es;
-        es.onmessage = (e) => { try { handleMsg(JSON.parse(e.data)); } catch { } };
+        es.onmessage = (e) => {
+            try {
+                handleMsg(JSON.parse(e.data));
+            } catch {
+                /* ignore malformed SSE messages */
+            }
+        };
         es.onerror   = () => { es.close(); setState(prev => ({ ...prev, error: 'Stream connection lost' })); };
     }, [campaignId, handleMsg]);
 
@@ -86,14 +92,19 @@ export function useCampaignPipeline(campaignId: string | null) {
         const wsBase = import.meta.env.VITE_WS_URL || `ws://${window.location.hostname}:4000`;
         const ws = new WebSocket(`${wsBase}/ws?campaignId=${campaignId}`);
         wsRef.current = ws;
-        ws.onmessage = (e) => { try { handleMsg(JSON.parse(e.data)); } catch { } };
+        ws.onmessage = (e) => {
+            try {
+                handleMsg(JSON.parse(e.data));
+            } catch {
+                /* ignore malformed WS messages */
+            }
+        };
         ws.onerror   = () => {
             // WS failed — fall back to SSE
             console.warn('[Pipeline] WS error, switching to SSE');
             ws.close();
             connectSSE();
         };
-        ws.onerror = ws.onerror; // keep TS happy
     }, [campaignId, handleMsg, connectSSE]);
 
     useEffect(() => {
@@ -107,7 +118,11 @@ export function useCampaignPipeline(campaignId: string | null) {
     // ── Abort (GatedCart Emergency Kill Switch) ──────────────────────────────
     const abort = useCallback(async () => {
         if (!campaignId) return;
-        try { await api.post(`/campaign/${campaignId}/abort`); } catch { }
+        try {
+            await api.post(`/campaign/${campaignId}/abort`);
+        } catch {
+            /* ignore abort request errors */
+        }
     }, [campaignId]);
 
     // ── Demo simulation ───────────────────────────────────────────────────────

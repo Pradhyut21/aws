@@ -79,7 +79,9 @@ export default function Sidebar({ collapsed: defaultCollapsed = false }: Sidebar
         try {
             const stored = localStorage.getItem('bm_user');
             if (stored) setUser(JSON.parse(stored));
-        } catch { }
+        } catch {
+            /* ignore malformed user session */
+        }
     }, []);
 
     const handleLogout = () => {

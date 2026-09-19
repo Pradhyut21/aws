@@ -252,10 +252,10 @@ ${content}`;
     try {
         const response = await invokeNovaPro(prompt, 500);
         let jsonStr = response.trim();
-        if (jsonStr.includes('\`\`\`json')) {
-            jsonStr = jsonStr.split('\`\`\`json')[1].split('\`\`\`')[0].trim();
-        } else if (jsonStr.includes('\`\`\`')) {
-            jsonStr = jsonStr.split('\`\`\`')[1].split('\`\`\`')[0].trim();
+        if (jsonStr.includes('```json')) {
+            jsonStr = jsonStr.split('```json')[1].split('```')[0].trim();
+        } else if (jsonStr.includes('```')) {
+            jsonStr = jsonStr.split('```')[1].split('```')[0].trim();
         }
 
         const parsed = JSON.parse(jsonStr);

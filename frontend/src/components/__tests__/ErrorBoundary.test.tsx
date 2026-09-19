@@ -8,7 +8,8 @@
  */
 
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import React from 'react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ErrorBoundary } from '../ErrorBoundary';
 
 // Suppress console.error for expected error boundary catches
@@ -21,7 +22,7 @@ afterEach(() => {
 });
 
 // Helper component that throws on render
-function BrokenComponent({ message }: { message: string }) {
+function BrokenComponent({ message }: { message: string }): React.ReactElement {
     throw new Error(message);
 }
 

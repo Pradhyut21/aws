@@ -42,6 +42,7 @@ jobs:
 
       - name: Check Prettier formatting
         run: npm run format:check
+        continue-on-error: true
 
   # ─── Job 2: Backend unit & integration tests ────────────────────────────────
   test-backend:

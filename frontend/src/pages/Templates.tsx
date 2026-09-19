@@ -48,7 +48,7 @@ export default function Templates() {
         return matchCat && matchSearch;
     });
 
-    const useTemplate = (template: Template) => {
+    const handleApplyTemplate = (template: Template) => {
         // Store template data in sessionStorage to prefill NewCampaign
         sessionStorage.setItem('template', JSON.stringify({ input: template.idea, language: template.language, businessType: template.businessType }));
         navigate('/campaign/new');
@@ -139,7 +139,7 @@ export default function Templates() {
                                     ))}
                                 </div>
 
-                                <button onClick={() => useTemplate(t)} className="w-full py-2 rounded-xl text-xs font-bold transition-all"
+                                <button onClick={() => handleApplyTemplate(t)} className="w-full py-2 rounded-xl text-xs font-bold transition-all"
                                     style={{ background: `${t.color}20`, color: t.color, border: `1px solid ${t.color}40` }}>
                                     Use This Template →
                                 </button>
